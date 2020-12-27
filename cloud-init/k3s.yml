@@ -6,18 +6,19 @@ fs_setup:
     device: /dev/vdb
 
 mounts:
-  - [vdb, /var/lib/rancher/k3s]
+  - [vdb, /mnt/persistent]
 
 write_files:
   - path: /root/k3s.env
     content: ${k3s_config}
     encoding: b64
-
-# for debugging only!
-password: ubuntu
-chpasswd: {expire: False}
+${indent(2, custom_cloud_config_write_files)}
 
 runcmd:
+  # setup persistence
+  - mkdir -p /mnt/persistent/var/lib/rancher /mnt/persistent/etc/rancher
+  - ln -s /mnt/persistent/var/lib/rancher /var/lib/rancher
+  - ln -s /mnt/persistent/etc/rancher /etc/rancher
   # install k3s
   - set -a; . /root/k3s.env; set +a
   - curl -sfL https://get.k3s.io | sh -
@@ -25,3 +26,4 @@ runcmd:
   - wget -O /tmp/cni-plugins.tgz https://github.com/containernetworking/plugins/releases/download/v0.9.0/cni-plugins-linux-amd64-v0.9.0.tgz
   - mkdir -p /opt/cni/bin
   - tar -xzC /opt/cni/bin -f /tmp/cni-plugins.tgz
+${indent(2, custom_cloud_config_runcmd)}

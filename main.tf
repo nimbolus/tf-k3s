@@ -14,20 +14,24 @@ resource "openstack_blockstorage_volume_v3" "k3s_data" {
 }
 
 resource "openstack_compute_instance_v2" "k3s_node" {
-  name      = var.name
-  image_id  = data.openstack_images_image_v2.k3s.id
-  flavor_id = data.openstack_compute_flavor_v2.k3s.id
-  key_pair  = var.keypair_name
-
+  name              = var.name
+  image_id          = data.openstack_images_image_v2.k3s.id
+  flavor_id         = data.openstack_compute_flavor_v2.k3s.id
+  key_pair          = var.keypair_name
+  config_drive      = var.config_drive
   availability_zone = var.availability_zone
 
   user_data = var.k3s_master ? templatefile("${path.module}/cloud-init/k3s.yml", {
+    custom_cloud_config_write_files = var.custom_cloud_config_write_files
+    custom_cloud_config_runcmd      = var.custom_cloud_config_runcmd
     k3s_config = base64encode(<<EOF
 K3S_TOKEN=${var.k3s_token}
 INSTALL_K3S_EXEC="${var.install_k3s_exec}"
 EOF
     )
     }) : templatefile("${path.module}/cloud-init/k3s.yml", {
+    custom_cloud_config_write_files = var.custom_cloud_config_write_files
+    custom_cloud_config_runcmd      = var.custom_cloud_config_runcmd
     k3s_config = base64encode(<<EOF
 K3S_TOKEN=${var.k3s_token}
 K3S_URL=${var.k3s_url}

@@ -26,6 +26,10 @@ variable "subnet_name" {
   type = string
 }
 
+variable "config_drive" {
+  default = false
+}
+
 variable "k3s_master" {
   default = true
 }
@@ -44,6 +48,14 @@ variable "install_k3s_exec" {
 
 variable "additional_port_ids" {
   default = []
+}
+
+variable "custom_cloud_config_write_files" {
+  default = ""
+}
+
+variable "custom_cloud_config_runcmd" {
+  default = ""
 }
 
 output "k3s_url" {

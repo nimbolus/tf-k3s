@@ -25,6 +25,26 @@ resource "openstack_networking_secgroup_rule_v2" "kubernetes_api" {
   security_group_id = openstack_networking_secgroup_v2.k3s.id
 }
 
+resource "openstack_networking_secgroup_rule_v2" "kubernetes_node_ports_tcp" {
+  direction         = "ingress"
+  ethertype         = "IPv4"
+  protocol          = "tcp"
+  port_range_min    = 30000
+  port_range_max    = 32767
+  remote_ip_prefix  = "0.0.0.0/0"
+  security_group_id = openstack_networking_secgroup_v2.k3s.id
+}
+
+resource "openstack_networking_secgroup_rule_v2" "kubernetes_node_ports_udp" {
+  direction         = "ingress"
+  ethertype         = "IPv4"
+  protocol          = "udp"
+  port_range_min    = 30000
+  port_range_max    = 32767
+  remote_ip_prefix  = "0.0.0.0/0"
+  security_group_id = openstack_networking_secgroup_v2.k3s.id
+}
+
 resource "openstack_networking_secgroup_rule_v2" "kubelet_metrics" {
   direction         = "ingress"
   ethertype         = "IPv4"
