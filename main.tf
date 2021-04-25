@@ -10,7 +10,8 @@ data "openstack_images_image_v2" "k3s" {
 resource "openstack_blockstorage_volume_v3" "k3s_data" {
   name              = "${var.name}-data"
   availability_zone = var.availability_zone
-  size              = 10
+  volume_type       = var.data_volume_type
+  size              = var.data_volume_size
 }
 
 resource "openstack_compute_instance_v2" "k3s_node" {
@@ -18,6 +19,7 @@ resource "openstack_compute_instance_v2" "k3s_node" {
   image_id          = data.openstack_images_image_v2.k3s.id
   flavor_id         = data.openstack_compute_flavor_v2.k3s.id
   key_pair          = var.keypair_name
+  metadata          = var.server_properties
   config_drive      = var.config_drive
   availability_zone = var.availability_zone
 

@@ -15,7 +15,8 @@ variable "availability_zone" {
 }
 
 variable "keypair_name" {
-  type = string
+  type    = string
+  default = null
 }
 
 variable "network_name" {
@@ -56,6 +57,24 @@ variable "custom_cloud_config_write_files" {
 
 variable "custom_cloud_config_runcmd" {
   default = ""
+}
+
+variable "data_volume_type" {
+  default = "__DEFAULT__"
+}
+
+variable "data_volume_size" {
+  default = 10
+}
+
+variable "server_properties" {
+  type        = map(string)
+  description = "additional metadata properties for instance"
+  default     = {}
+}
+
+output "k3s_node_ip_address" {
+  value = openstack_compute_instance_v2.k3s_node.network.0.fixed_ip_v4
 }
 
 output "k3s_url" {
