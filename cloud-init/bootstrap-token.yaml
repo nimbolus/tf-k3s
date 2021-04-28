@@ -1,0 +1,31 @@
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: bootstrap-token-${token_id}
+  namespace: kube-system
+
+type: bootstrap.kubernetes.io/token
+stringData:
+  description: "bootstrap token"
+
+  token-id: ${token_id}
+  token-secret: ${token_secret}
+
+  usage-bootstrap-authentication: "true"
+  usage-bootstrap-signing: "true"
+
+  auth-extra-groups: system:bootstrappers:worker,system:bootstrappers:ingress
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: bootstrap-admin
+subjects:
+- kind: Group
+  name: system:bootstrappers
+  apiGroup: rbac.authorization.k8s.io
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-admin

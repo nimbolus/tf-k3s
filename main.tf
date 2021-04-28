@@ -23,15 +23,7 @@ resource "openstack_compute_instance_v2" "k3s_node" {
   config_drive      = var.config_drive
   availability_zone = var.availability_zone
 
-  user_data = var.k3s_master ? templatefile("${path.module}/cloud-init/k3s.yml", {
-    custom_cloud_config_write_files = var.custom_cloud_config_write_files
-    custom_cloud_config_runcmd      = var.custom_cloud_config_runcmd
-    k3s_config = base64encode(<<EOF
-K3S_TOKEN=${var.k3s_token}
-INSTALL_K3S_EXEC="${var.install_k3s_exec}"
-EOF
-    )
-    }) : templatefile("${path.module}/cloud-init/k3s.yml", {
+  user_data = templatefile("${path.module}/cloud-init/k3s.yml", {
     custom_cloud_config_write_files = var.custom_cloud_config_write_files
     custom_cloud_config_runcmd      = var.custom_cloud_config_runcmd
     k3s_config = base64encode(<<EOF
@@ -40,6 +32,11 @@ K3S_URL=${var.k3s_url}
 INSTALL_K3S_EXEC="${var.install_k3s_exec}"
 EOF
     )
+    k3s_bootstrap_manifest_b64 = var.bootstrap_token_id != "" ? base64encode(
+      templatefile("${path.module}/cloud-init/bootstrap-token.yaml", {
+        token_id     = var.bootstrap_token_id
+        token_secret = var.bootstrap_token_secret
+    })) : ""
   })
 
   network {

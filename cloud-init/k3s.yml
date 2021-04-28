@@ -12,6 +12,11 @@ write_files:
   - path: /root/k3s.env
     content: ${k3s_config}
     encoding: b64
+%{if k3s_bootstrap_manifest_b64 != "" }
+  - path: /root/k3s-bootstrap.yaml
+    content: ${k3s_bootstrap_manifest_b64}
+    encoding: b64
+%{endif}
 ${indent(2, custom_cloud_config_write_files)}
 
 runcmd:
@@ -26,4 +31,7 @@ runcmd:
   - wget -O /tmp/cni-plugins.tgz https://github.com/containernetworking/plugins/releases/download/v0.9.0/cni-plugins-linux-amd64-v0.9.0.tgz
   - mkdir -p /opt/cni/bin
   - tar -xzC /opt/cni/bin -f /tmp/cni-plugins.tgz
+%{if k3s_bootstrap_manifest_b64 != "" }
+  - cp /root/k3s-bootstrap.yaml /var/lib/rancher/k3s/server/manifests
+%{endif}
 ${indent(2, custom_cloud_config_runcmd)}

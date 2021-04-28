@@ -19,20 +19,34 @@ variable "keypair_name" {
   default = null
 }
 
-variable "network_name" {
+variable "network_id" {
   type = string
 }
 
-variable "subnet_name" {
+variable "subnet_id" {
   type = string
+}
+
+variable "security_group_id" {
+  type    = string
+  default = null
+}
+
+variable "allow_remote_prefix" {
+  default = "0.0.0.0/0"
+}
+
+variable "additional_security_group_ids" {
+  type    = list(string)
+  default = []
 }
 
 variable "config_drive" {
   default = false
 }
 
-variable "k3s_master" {
-  default = true
+variable "k3s_join" {
+  default = false
 }
 
 variable "k3s_token" {
@@ -45,6 +59,15 @@ variable "k3s_url" {
 
 variable "install_k3s_exec" {
   default = ""
+}
+
+variable "bootstrap_token_id" {
+  default = ""
+}
+
+variable "bootstrap_token_secret" {
+  default   = ""
+  sensitive = true
 }
 
 variable "additional_port_ids" {
@@ -71,12 +94,4 @@ variable "server_properties" {
   type        = map(string)
   description = "additional metadata properties for instance"
   default     = {}
-}
-
-output "k3s_node_ip_address" {
-  value = openstack_compute_instance_v2.k3s_node.network.0.fixed_ip_v4
-}
-
-output "k3s_url" {
-  value = var.k3s_master ? "https://${openstack_compute_instance_v2.k3s_node.network.0.fixed_ip_v4}:6443" : var.k3s_url
 }
