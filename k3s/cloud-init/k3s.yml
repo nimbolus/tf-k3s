@@ -32,6 +32,7 @@ runcmd:
   - mkdir -p /opt/cni/bin
   - tar -xzC /opt/cni/bin -f /tmp/cni-plugins.tgz
 %{if k3s_bootstrap_manifest_b64 != "" }
-  - cp /root/k3s-bootstrap.yaml /var/lib/rancher/k3s/server/manifests
+  - mkdir -p /var/lib/rancher/k3s/server/manifests/
+  - cp /root/k3s-bootstrap.yaml /var/lib/rancher/k3s/server/manifests/
 %{endif}
 ${indent(2, custom_cloud_config_runcmd)}

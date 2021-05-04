@@ -1,6 +1,6 @@
 resource "openstack_networking_secgroup_v2" "k3s" {
   count       = var.security_group_id == null ? 1 : 0
-  name        = "allow-k3s-${var.name}"
+  name        = var.security_group_name
   description = "allow k3s services"
 }
 

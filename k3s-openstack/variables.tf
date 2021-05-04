@@ -1,7 +1,3 @@
-variable "name" {
-  type = string
-}
-
 variable "image_name" {
   default = "ubuntu-20.04"
 }
@@ -32,6 +28,11 @@ variable "security_group_id" {
   default = null
 }
 
+variable "security_group_name" {
+  type    = string
+  default = "allow-k3s"
+}
+
 variable "allow_remote_prefix" {
   default = "0.0.0.0/0"
 }
@@ -45,41 +46,8 @@ variable "config_drive" {
   default = false
 }
 
-variable "k3s_join" {
-  default = false
-}
-
-variable "k3s_token" {
-  type = string
-}
-
-variable "k3s_url" {
-  default = ""
-}
-
-variable "install_k3s_exec" {
-  default = ""
-}
-
-variable "bootstrap_token_id" {
-  default = ""
-}
-
-variable "bootstrap_token_secret" {
-  default   = ""
-  sensitive = true
-}
-
 variable "additional_port_ids" {
   default = []
-}
-
-variable "custom_cloud_config_write_files" {
-  default = ""
-}
-
-variable "custom_cloud_config_runcmd" {
-  default = ""
 }
 
 variable "data_volume_type" {

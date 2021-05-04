@@ -1,0 +1,1 @@
+../k3s/variables.tf
