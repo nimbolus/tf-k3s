@@ -40,3 +40,7 @@ variable "custom_cloud_config_write_files" {
 variable "custom_cloud_config_runcmd" {
   default = ""
 }
+
+variable "ca_shell_script_timeout" {
+  default = 300
+}

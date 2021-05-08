@@ -37,7 +37,7 @@ data "shell_script" "ca" {
   count = var.k3s_join_existing ? 0 : 1
   lifecycle_commands {
     read = <<-EOF
-until kubectl --server ${local.k3s_url} --token ${var.bootstrap_token_id}.${var.bootstrap_token_secret} --insecure-skip-tls-verify get secret -o jsonpath="{.items[?(@.type==\"kubernetes.io/service-account-token\")].data}" ; do sleep 1; done
+timeout ${var.ca_shell_script_timeout} bash -c 'until kubectl --server ${local.k3s_url} --token ${var.bootstrap_token_id}.${var.bootstrap_token_secret} --insecure-skip-tls-verify get secret -o jsonpath="{.items[?(@.type==\"kubernetes.io/service-account-token\")].data}" ; do sleep 1; done'
 EOF
   }
 }
