@@ -58,6 +58,10 @@ variable "data_volume_size" {
   default = 10
 }
 
+variable "data_volume_enable_online_resize" {
+  default = true
+}
+
 variable "server_properties" {
   type        = map(string)
   description = "additional metadata properties for instance"

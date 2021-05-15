@@ -8,10 +8,11 @@ data "openstack_images_image_v2" "k3s" {
 }
 
 resource "openstack_blockstorage_volume_v3" "data" {
-  name              = "${var.name}-data"
-  availability_zone = var.availability_zone
-  volume_type       = var.data_volume_type
-  size              = var.data_volume_size
+  name                 = "${var.name}-data"
+  availability_zone    = var.availability_zone
+  volume_type          = var.data_volume_type
+  size                 = var.data_volume_size
+  enable_online_resize = var.data_volume_enable_online_resize
 }
 
 module "k3s" {
