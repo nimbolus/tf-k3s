@@ -27,3 +27,8 @@ output "kubeconfig" {
   sensitive = true
   value     = module.k3s.kubeconfig
 }
+
+output "user_data" {
+  sensitive = true
+  value     = module.k3s.user_data
+}

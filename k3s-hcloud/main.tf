@@ -7,14 +7,16 @@ resource "hcloud_volume" "node" {
 module "k3s" {
   source = "../k3s"
 
-  name                   = var.name
-  k3s_join_existing      = var.k3s_join_existing
-  k3s_token              = var.k3s_token
-  k3s_ip                 = var.k3s_join_existing ? var.k3s_ip : hcloud_server.node.ipv4_address
-  k3s_url                = var.k3s_url
-  install_k3s_exec       = var.install_k3s_exec
-  bootstrap_token_id     = var.bootstrap_token_id
-  bootstrap_token_secret = var.bootstrap_token_secret
+  name                            = var.name
+  k3s_join_existing               = var.k3s_join_existing
+  k3s_token                       = var.k3s_token
+  k3s_ip                          = var.k3s_join_existing ? var.k3s_ip : hcloud_server.node.ipv4_address
+  k3s_url                         = var.k3s_url
+  install_k3s_exec                = var.install_k3s_exec
+  custom_cloud_config_write_files = var.custom_cloud_config_write_files
+  custom_cloud_config_runcmd      = var.custom_cloud_config_runcmd
+  bootstrap_token_id              = var.bootstrap_token_id
+  bootstrap_token_secret          = var.bootstrap_token_secret
 }
 
 resource "hcloud_server" "node" {
