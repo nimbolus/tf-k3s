@@ -67,3 +67,8 @@ variable "server_properties" {
   description = "additional metadata properties for instance"
   default     = {}
 }
+
+variable "server_ip_address" {
+  default     = null
+  description = "fixed ip address for instance"
+}

@@ -78,7 +78,8 @@ resource "openstack_networking_port_v2" "mgmt" {
   port_security_enabled = true
 
   fixed_ip {
-    subnet_id = var.subnet_id
+    subnet_id  = var.subnet_id
+    ip_address = var.server_ip_address
   }
 
 }
