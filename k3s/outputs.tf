@@ -20,6 +20,7 @@ EOF
 locals {
   k3s_url = var.k3s_join_existing ? var.k3s_url : "https://${var.k3s_ip}:6443"
 }
+
 output "k3s_url" {
   value = local.k3s_url
 }
@@ -34,7 +35,7 @@ output "bootstrap_token_secret" {
 }
 
 data "shell_script" "ca" {
-  count = var.k3s_join_existing ? 0 : 1
+  count = var.k3s_join_existing || var.bootstrap_token_secret == "" ? 0 : 1
   lifecycle_commands {
     read = <<-EOF
 timeout ${var.ca_shell_script_timeout} bash -c 'until kubectl --server ${local.k3s_url} --token ${var.bootstrap_token_id}.${var.bootstrap_token_secret} --insecure-skip-tls-verify get secret -o jsonpath="{.items[?(@.type==\"kubernetes.io/service-account-token\")].data}" ; do sleep 1; done'
@@ -43,12 +44,12 @@ EOF
 }
 
 output "ca_crt" {
-  value = var.k3s_join_existing ? "" : data.shell_script.ca[0].output["ca.crt"]
+  value = length(data.shell_script.ca) == 0 ? "" : data.shell_script.ca[0].output["ca.crt"]
 }
 
 output "kubeconfig" {
   sensitive = true
-  value     = var.k3s_join_existing ? "" : <<EOF
+  value     = length(data.shell_script.ca) == 0 ? "" : <<EOF
 apiVersion: v1
 clusters:
 - cluster:

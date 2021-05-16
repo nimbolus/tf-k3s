@@ -12,3 +12,11 @@ Note that network, subnet and key pair needs to be created beforehand.
 - [Simple Module for templating cloudinit user_data](./example-simple.tf)
 - [HA-Master and bootstrap token with OpenStack](./example-ha-openstack.tf)
 - [Single Master and Worker with hcloud](./example-simple-hcloud.tf)
+
+## Requirements
+
+MacOS users need to install `coreutils` for the `timeout` command:
+
+```sh
+brew install coreutils
+```
