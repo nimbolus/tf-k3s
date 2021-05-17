@@ -2,11 +2,11 @@ output "user_data" {
   value = templatefile("${path.module}/cloud-init/k3s.yml", {
     custom_cloud_config_write_files = var.custom_cloud_config_write_files
     custom_cloud_config_runcmd      = var.custom_cloud_config_runcmd
-    k3s_config = base64encode(<<EOF
+    k3s_config = base64encode(<<EOT
 K3S_TOKEN=${var.k3s_token}
 K3S_URL=${var.k3s_url}
 INSTALL_K3S_EXEC="${var.install_k3s_exec}"
-EOF
+EOT
     )
     k3s_bootstrap_manifest_b64 = var.bootstrap_token_id != "" ? base64encode(
       templatefile("${path.module}/cloud-init/bootstrap-token.yaml", {
@@ -37,9 +37,9 @@ output "bootstrap_token_secret" {
 data "shell_script" "ca" {
   count = var.k3s_join_existing || var.bootstrap_token_secret == "" ? 0 : 1
   lifecycle_commands {
-    read = <<-EOF
+    read = <<-EOT
 timeout ${var.ca_shell_script_timeout} bash -c 'until kubectl --server ${local.k3s_url} --token ${var.bootstrap_token_id}.${var.bootstrap_token_secret} --insecure-skip-tls-verify get secret -o jsonpath="{.items[?(@.type==\"kubernetes.io/service-account-token\")].data}" ; do sleep 1; done'
-EOF
+EOT
   }
 }
 
@@ -49,7 +49,7 @@ output "ca_crt" {
 
 output "kubeconfig" {
   sensitive = true
-  value     = length(data.shell_script.ca) == 0 ? "" : <<EOF
+  value     = length(data.shell_script.ca) == 0 ? "" : <<EOT
 apiVersion: v1
 clusters:
 - cluster:
@@ -68,5 +68,5 @@ users:
 - name: default
   user:
     token: ${var.bootstrap_token_id}.${var.bootstrap_token_secret}
-EOF
+EOT
 }
