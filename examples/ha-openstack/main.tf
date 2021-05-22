@@ -24,7 +24,8 @@ locals {
 }
 
 module "bootstrap_auth" {
-  source = "../../bootstrap-auth"
+  source     = "../../bootstrap-auth"
+  depends_on = [module.secgroup]
 
   k3s_url = module.server1.k3s_url
   token   = local.token
