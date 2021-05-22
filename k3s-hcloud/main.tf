@@ -9,7 +9,7 @@ module "k3s" {
 
   name                            = var.name
   k3s_join_existing               = var.k3s_join_existing
-  k3s_token                       = var.k3s_token
+  cluster_token                   = var.cluster_token
   k3s_ip                          = var.k3s_join_existing ? var.k3s_ip : hcloud_server.node.ipv4_address
   k3s_url                         = var.k3s_url
   install_k3s_exec                = var.install_k3s_exec
@@ -37,4 +37,8 @@ resource "hcloud_volume_attachment" "node" {
 resource "hcloud_server_network" "node" {
   server_id  = hcloud_server.node.id
   network_id = var.network_id
+}
+
+locals {
+  node_ip = hcloud_server.node.ipv4_address
 }
