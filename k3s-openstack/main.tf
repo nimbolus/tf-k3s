@@ -20,7 +20,7 @@ module "k3s" {
 
   name                            = var.name
   k3s_join_existing               = var.k3s_join_existing
-  k3s_token                       = var.k3s_token
+  cluster_token                   = var.cluster_token
   k3s_ip                          = var.k3s_join_existing ? var.k3s_ip : openstack_networking_port_v2.mgmt.all_fixed_ips[0]
   k3s_url                         = var.k3s_url
   install_k3s_exec                = var.install_k3s_exec
@@ -67,4 +67,22 @@ resource "openstack_compute_instance_v2" "node" {
     destination_type      = "volume"
     delete_on_termination = false
   }
+}
+
+resource "openstack_networking_port_v2" "mgmt" {
+  name                  = var.name
+  network_id            = var.network_id
+  admin_state_up        = true
+  security_group_ids    = var.security_group_ids
+  port_security_enabled = true
+
+  fixed_ip {
+    subnet_id  = var.subnet_id
+    ip_address = var.server_ip_address
+  }
+
+}
+
+locals {
+  node_ip = openstack_compute_instance_v2.node.network.0.fixed_ip_v4
 }

@@ -23,21 +23,7 @@ variable "subnet_id" {
   type = string
 }
 
-variable "security_group_id" {
-  type    = string
-  default = null
-}
-
-variable "security_group_name" {
-  type    = string
-  default = "allow-k3s"
-}
-
-variable "allow_remote_prefix" {
-  default = "0.0.0.0/0"
-}
-
-variable "additional_security_group_ids" {
+variable "security_group_ids" {
   type    = list(string)
   default = []
 }
