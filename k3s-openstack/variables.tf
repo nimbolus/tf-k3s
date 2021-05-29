@@ -58,3 +58,8 @@ variable "server_ip_address" {
   default     = null
   description = "fixed ip address for instance"
 }
+
+variable "server_stop_before_destroy" {
+  default     = true
+  description = "shutdown instance gracefully before destroying"
+}
