@@ -31,14 +31,15 @@ module "k3s" {
 }
 
 resource "openstack_compute_instance_v2" "node" {
-  name              = var.name
-  image_id          = data.openstack_images_image_v2.k3s.id
-  flavor_id         = data.openstack_compute_flavor_v2.k3s.id
-  key_pair          = var.keypair_name
-  metadata          = var.server_properties
-  config_drive      = var.config_drive
-  availability_zone = var.availability_zone
-  user_data         = module.k3s.user_data
+  name                = var.name
+  image_id            = data.openstack_images_image_v2.k3s.id
+  flavor_id           = data.openstack_compute_flavor_v2.k3s.id
+  key_pair            = var.keypair_name
+  metadata            = var.server_properties
+  config_drive        = var.config_drive
+  availability_zone   = var.availability_zone
+  user_data           = module.k3s.user_data
+  stop_before_destroy = var.server_stop_before_destroy
 
   network {
     port           = openstack_networking_port_v2.mgmt.id
