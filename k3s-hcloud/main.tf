@@ -4,14 +4,25 @@ resource "hcloud_volume" "node" {
   size     = var.data_volume_size
 }
 
+data "hcloud_network" "network" {
+  id = var.network_id
+}
+
+locals {
+  internal_route_target = split("/", data.hcloud_network.network.ip_range)[0]
+  internal_ip_command   = "$(while ! ip r | grep -q '${data.hcloud_network.network.ip_range}'; do sleep 1; done; ip -o r get ${local.internal_route_target} | sed -n 's/.*src \\([0-9.]\\+\\).*/\\1/p')"
+  external_ip_command   = "$(ip -o r get 1.1.1.1 | sed -n 's/.*src \\([0-9.]\\+\\).*/\\1/p')"
+}
+
 module "k3s" {
   source = "../k3s"
 
   name                            = var.name
   k3s_join_existing               = var.k3s_join_existing
   cluster_token                   = var.cluster_token
-  k3s_ip                          = var.k3s_join_existing ? var.k3s_ip : hcloud_server.node.ipv4_address
+  k3s_ip                          = var.k3s_ip != null ? var.k3s_ip : local.internal_ip_command
   k3s_url                         = var.k3s_url
+  k3s_external_ip                 = var.k3s_external_ip != null ? var.k3s_external_ip : local.external_ip_command
   install_k3s_exec                = var.install_k3s_exec
   custom_cloud_config_write_files = var.custom_cloud_config_write_files
   custom_cloud_config_runcmd      = var.custom_cloud_config_runcmd
@@ -37,8 +48,12 @@ resource "hcloud_volume_attachment" "node" {
 resource "hcloud_server_network" "node" {
   server_id  = hcloud_server.node.id
   network_id = var.network_id
+  ip         = var.k3s_ip
 }
 
 locals {
-  node_ip = hcloud_server.node.ipv4_address
+  node_ip          = hcloud_server_network.node.ip
+  node_external_ip = hcloud_server.node.ipv4_address
+  k3s_url          = var.k3s_join_existing ? var.k3s_url : "https://${local.node_ip}:6443"
+  k3s_external_url = var.k3s_join_existing ? "" : "https://${local.node_external_ip}:6443"
 }

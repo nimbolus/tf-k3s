@@ -26,6 +26,12 @@ runcmd:
   - ln -s /mnt/persistent/etc/rancher /etc/rancher
   # install k3s
   - set -a; . /root/k3s.env; set +a
+%{if ip != null }
+  - export INSTALL_K3S_EXEC="$INSTALL_K3S_EXEC --node-ip=${ip} --advertise-address=${ip}"
+%{endif}
+%{if external_ip != null }
+  - export INSTALL_K3S_EXEC="$INSTALL_K3S_EXEC --node-external-ip=${external_ip}"
+%{endif}
   - curl -sfL https://get.k3s.io | sh -
   # install cni plugins
   - wget -O /tmp/cni-plugins.tgz https://github.com/containernetworking/plugins/releases/download/v0.9.0/cni-plugins-linux-amd64-v0.9.0.tgz
