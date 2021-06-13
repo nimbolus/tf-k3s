@@ -54,12 +54,13 @@ variable "server_properties" {
   default     = {}
 }
 
-variable "server_ip_address" {
-  default     = null
-  description = "fixed ip address for instance"
-}
-
 variable "server_stop_before_destroy" {
   default     = true
   description = "shutdown instance gracefully before destroying"
+}
+
+variable "floating_ip_pool" {
+  default     = null
+  type        = string
+  description = "if defined a floating ip will be assigned to the node and registered as k3s_external_ip"
 }

@@ -25,7 +25,7 @@ variable "k3s_url" {
 variable "k3s_external_ip" {
   type        = string
   default     = null
-  description = "external or floating ip address of the k3s node"
+  description = "external ip address of the k3s node"
 }
 
 variable "install_k3s_exec" {
