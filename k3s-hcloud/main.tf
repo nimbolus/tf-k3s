@@ -4,13 +4,9 @@ resource "hcloud_volume" "node" {
   size     = var.data_volume_size
 }
 
-data "hcloud_network" "network" {
-  id = var.network_id
-}
-
 locals {
-  internal_route_target = split("/", data.hcloud_network.network.ip_range)[0]
-  internal_ip_command   = "$(while ! ip r | grep -q '${data.hcloud_network.network.ip_range}'; do sleep 1; done; ip -o r get ${local.internal_route_target} | sed -n 's/.*src \\([0-9.]\\+\\).*/\\1/p')"
+  internal_route_target = split("/", var.network_range)[0]
+  internal_ip_command   = "$(while ! ip r | grep -q '${var.network_range}'; do sleep 1; done; ip -o r get ${local.internal_route_target} | sed -n 's/.*src \\([0-9.]\\+\\).*/\\1/p')"
   external_ip_command   = "$(ip -o r get 1.1.1.1 | sed -n 's/.*src \\([0-9.]\\+\\).*/\\1/p')"
 }
 

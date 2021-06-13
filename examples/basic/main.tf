@@ -8,19 +8,44 @@ resource "random_password" "cluster_token" {
 }
 
 module "k3s_server" {
-  source = "github.com/nimbolus/tf-k3s/k3s"
+  source = "../../k3s"
 
   name             = "k3s-server"
-  k3s_token        = random_password.cluster_token.result
+  cluster_token    = random_password.cluster_token.result
+  k3s_ip           = var.server_ip
   install_k3s_exec = "server --disable traefik --node-label az=ex1"
 }
 
+locals {
+  k3s_url = "https://${var.server_ip}:6443"
+}
+
 module "k3s_agent" {
-  source = "github.com/nimbolus/tf-k3s/k3s"
+  source = "../../k3s"
 
   name              = "k3s-agent"
   k3s_join_existing = true
-  k3s_url           = module.k3s_server.k3s_url
-  k3s_token         = random_password.cluster_token.result
+  k3s_url           = local.k3s_url
+  cluster_token     = random_password.cluster_token.result
+  k3s_ip            = var.agent_ip
   install_k3s_exec  = "agent --node-label az=ex1"
+}
+
+output "cluster_token" {
+  value     = random_password.cluster_token.result
+  sensitive = true
+}
+
+output "k3s_url" {
+  value = local.k3s_url
+}
+
+output "server_user_data" {
+  value     = module.k3s_server.user_data
+  sensitive = true
+}
+
+output "agent_user_data" {
+  value     = module.k3s_agent.user_data
+  sensitive = true
 }
