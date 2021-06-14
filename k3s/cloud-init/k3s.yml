@@ -1,12 +1,14 @@
 #cloud-config
 
+%{if persistent_volume_dev != "" }
 fs_setup:
   - label: k3s-data
     filesystem: ext4
-    device: /dev/vdb
+    device: ${persistent_volume_dev}
 
 mounts:
-  - [vdb, /mnt/persistent]
+  - [${persistent_volume_dev}, /mnt/persistent]
+%{endif}
 
 write_files:
   - path: /root/k3s.env

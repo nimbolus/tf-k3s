@@ -24,6 +24,7 @@ module "k3s" {
   custom_cloud_config_runcmd      = var.custom_cloud_config_runcmd
   bootstrap_token_id              = var.bootstrap_token_id
   bootstrap_token_secret          = var.bootstrap_token_secret
+  persistent_volume_dev           = "/dev/disk/by-id/scsi-0HC_Volume_${hcloud_volume.node.id}"
 }
 
 resource "hcloud_server" "node" {

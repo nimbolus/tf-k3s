@@ -54,3 +54,8 @@ variable "custom_cloud_config_write_files" {
 variable "custom_cloud_config_runcmd" {
   default = ""
 }
+
+variable "persistent_volume_dev" {
+  default     = ""
+  description = "optional device for persistent data (e.g. /dev/vdb)"
+}

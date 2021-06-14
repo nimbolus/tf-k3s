@@ -29,6 +29,7 @@ module "k3s" {
   custom_cloud_config_runcmd      = var.custom_cloud_config_runcmd
   bootstrap_token_id              = var.bootstrap_token_id
   bootstrap_token_secret          = var.bootstrap_token_secret
+  persistent_volume_dev           = "/dev/vdb"
 }
 
 resource "openstack_compute_instance_v2" "node" {
