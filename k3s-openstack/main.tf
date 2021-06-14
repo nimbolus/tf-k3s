@@ -101,5 +101,5 @@ locals {
   node_ip          = openstack_compute_instance_v2.node.network.0.fixed_ip_v4
   node_external_ip = length(openstack_networking_floatingip_v2.node) > 0 ? openstack_networking_floatingip_v2.node[0].address : null
   k3s_url          = var.k3s_join_existing ? var.k3s_url : "https://${local.node_ip}:6443"
-  k3s_external_url = var.k3s_join_existing || local.node_external_ip == null ? "" : "https://${local.node_external_ip}:6443"
+  k3s_external_url = (var.k3s_join_existing || local.node_external_ip == null) ? "" : "https://${local.node_external_ip}:6443"
 }

@@ -14,10 +14,10 @@ func TestK3sHA(t *testing.T) {
 	t.Parallel()
 
 	vars := map[string]interface{}{
-		"availability_zone": os.Getenv("OPENSTACK_AZ"),
-		"network_id":        os.Getenv("OPENSTACK_NETWORK_ID"),
-		"subnet_id":         os.Getenv("OPENSTACK_SUBNET_ID"),
-		"floating_ip_pool":  os.Getenv("OPENSTACK_FLOATING_IP_POOL"),
+		"availability_zone": os.Getenv("TF_VAR_availability_zone"),
+		"network_id":        os.Getenv("TF_VAR_network_id"),
+		"subnet_id":         os.Getenv("TF_VAR_subnet_id"),
+		"floating_ip_pool":  os.Getenv("TF_VAR_floating_ip_pool"),
 	}
 
 	terraformOptions := terraform.WithDefaultRetryableErrors(t, &terraform.Options{
@@ -36,8 +36,8 @@ func TestK3sHA(t *testing.T) {
 	k3sServerUserdata := terraform.Output(t, terraformOptions, "server_user_data")
 	common.VerifyUserdata(t, k3sServerUserdata, k3sToken, "", fmt.Sprintf("server --cluster-init --kube-apiserver-arg=\"enable-bootstrap-token-auth\" --disable traefik --node-label az=%s", vars["availability_zone"]))
 
-	// k3sExternalURL := terraform.Output(t, terraformOptions, "k3s_external_url")
-	common.VerifyK8sAPIAnonymous(t, k3sURL) // should use external
+	k3sExternalURL := terraform.Output(t, terraformOptions, "k3s_external_url")
+	common.VerifyK8sAPIAnonymous(t, k3sExternalURL)
 
 	kubeconfig := terraform.Output(t, terraformOptions, "kubeconfig")
 	kubeconfigFile, err := common.WriteTempKubeconfig(kubeconfig)

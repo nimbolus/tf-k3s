@@ -28,7 +28,7 @@ module "bootstrap_auth" {
   source     = "../../bootstrap-auth"
   depends_on = [module.secgroup]
 
-  k3s_url = module.server1.k3s_url
+  k3s_url = module.server1.k3s_external_url
   token   = local.token
 }
 
@@ -44,7 +44,7 @@ module "server1" {
   subnet_id          = var.subnet_id
   security_group_ids = [module.secgroup.id]
   data_volume_size   = 1
-  # floating_ip_pool   = var.floating_ip_pool
+  floating_ip_pool   = var.floating_ip_pool
 
   cluster_token          = random_password.cluster_token.result
   install_k3s_exec       = "server --cluster-init ${local.common_k3s_server_exec}"
