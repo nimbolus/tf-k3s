@@ -60,7 +60,7 @@ variable "server_stop_before_destroy" {
 }
 
 variable "floating_ip_pool" {
-  default     = null
   type        = string
+  default     = null
   description = "if defined a floating ip will be assigned to the node and registered as k3s_external_ip"
 }

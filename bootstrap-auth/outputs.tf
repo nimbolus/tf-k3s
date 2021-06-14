@@ -4,7 +4,7 @@ data "shell_script" "ca" {
 timeout "${var.ca_shell_script_timeout}" bash -c ' \
   until \
     kubectl --server "${var.k3s_url}" --insecure-skip-tls-verify --token "${var.token}" \
-      get secret -o jsonpath="{.items[?(@.type==\"kubernetes.io/service-account-token\")].data}"
+      get secret -o jsonpath="{.items[?(@.type==\"kubernetes.io/service-account-token\")].data}" | grep "ca.crt"
   do
     sleep 1
   done'

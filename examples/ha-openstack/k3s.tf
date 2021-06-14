@@ -20,7 +20,8 @@ module "secgroup" {
 }
 
 locals {
-  token = "${random_password.bootstrap_token_id.result}.${random_password.bootstrap_token_secret.result}"
+  token                  = "${random_password.bootstrap_token_id.result}.${random_password.bootstrap_token_secret.result}"
+  common_k3s_server_exec = "--kube-apiserver-arg=\"enable-bootstrap-token-auth\" --disable traefik --node-label az=${var.availability_zone}"
 }
 
 module "bootstrap_auth" {
@@ -35,16 +36,18 @@ module "server1" {
   source = "../../k3s-openstack"
 
   name               = "k3s-server-1"
-  image_name         = "ubuntu-20.04-ansible"
+  image_name         = var.image_name
   flavor_name        = "m1.small"
-  availability_zone  = "ex"
-  keypair_name       = "example-keypair"
-  network_id         = "example-id"
-  subnet_id          = "example-id"
+  availability_zone  = var.availability_zone
+  keypair_name       = openstack_compute_keypair_v2.k3s.name
+  network_id         = var.network_id
+  subnet_id          = var.subnet_id
   security_group_ids = [module.secgroup.id]
+  data_volume_size   = 1
+  # floating_ip_pool   = var.floating_ip_pool
 
   cluster_token          = random_password.cluster_token.result
-  install_k3s_exec       = "server --cluster-init --kube-apiserver-arg=\"enable-bootstrap-token-auth\" --node-label az=ex"
+  install_k3s_exec       = "server --cluster-init ${local.common_k3s_server_exec}"
   bootstrap_token_id     = random_password.bootstrap_token_id.result
   bootstrap_token_secret = random_password.bootstrap_token_secret.result
 }
@@ -55,42 +58,66 @@ module "servers" {
   count = 2
 
   name               = "k3s-server-${count.index + 2}"
-  image_name         = "ubuntu-20.04-ansible"
+  image_name         = var.image_name
   flavor_name        = "m1.small"
-  availability_zone  = "ex"
-  keypair_name       = "example-keypair"
-  network_id         = "example-id"
-  subnet_id          = "example-id"
+  availability_zone  = var.availability_zone
+  keypair_name       = openstack_compute_keypair_v2.k3s.name
+  network_id         = var.network_id
+  subnet_id          = var.subnet_id
   security_group_ids = [module.secgroup.id]
+  data_volume_size   = 1
 
   k3s_join_existing = true
   k3s_url           = module.server1.k3s_url
   cluster_token     = random_password.cluster_token.result
-  install_k3s_exec  = "server --kube-apiserver-arg=\"enable-bootstrap-token-auth\" --node-label az=ex"
+  install_k3s_exec  = "server ${local.common_k3s_server_exec}"
 }
 
 module "agents" {
   source = "../../k3s-openstack"
 
-  count = 3
+  count = 1
 
   name               = "k3s-agent-${count.index + 1}"
-  image_name         = "ubuntu-20.04-ansible"
+  image_name         = var.image_name
   flavor_name        = "m1.small"
-  availability_zone  = "ex"
-  keypair_name       = "example-keypair"
-  network_id         = "example-id"
-  subnet_id          = "example-id"
+  availability_zone  = var.availability_zone
+  keypair_name       = openstack_compute_keypair_v2.k3s.name
+  network_id         = var.network_id
+  subnet_id          = var.subnet_id
   security_group_ids = [module.secgroup.id]
+  data_volume_size   = 1
 
   k3s_join_existing = true
   k3s_url           = module.server1.k3s_url
   cluster_token     = random_password.cluster_token.result
-  install_k3s_exec  = "agent --node-label az=ex"
+  install_k3s_exec  = "agent --node-label az=${var.availability_zone}"
+}
+
+output "cluster_token" {
+  value     = random_password.cluster_token.result
+  sensitive = true
 }
 
 output "k3s_url" {
   value = module.server1.k3s_url
+}
+
+output "k3s_external_url" {
+  value = module.server1.k3s_external_url
+}
+
+output "server_ip" {
+  value = module.server1.node_ip
+}
+
+output "server_external_ip" {
+  value = module.server1.node_external_ip
+}
+
+output "server_user_data" {
+  value     = module.server1.user_data
+  sensitive = true
 }
 
 output "token" {

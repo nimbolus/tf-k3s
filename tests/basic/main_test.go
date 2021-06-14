@@ -22,8 +22,6 @@ func TestK3sBasic(t *testing.T) {
 		Vars:         vars,
 	})
 
-	defer terraform.Destroy(t, terraformOptions)
-
 	terraform.InitAndApply(t, terraformOptions)
 
 	k3sToken := terraform.Output(t, terraformOptions, "cluster_token")
@@ -36,4 +34,8 @@ func TestK3sBasic(t *testing.T) {
 
 	k3sAgentUserdata := terraform.Output(t, terraformOptions, "agent_user_data")
 	common.VerifyUserdata(t, k3sAgentUserdata, k3sToken, k3sURL, "agent --node-label az=ex1")
+
+	if !t.Failed() {
+		terraform.Destroy(t, terraformOptions)
+	}
 }

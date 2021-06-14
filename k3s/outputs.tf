@@ -4,6 +4,7 @@ output "user_data" {
     custom_cloud_config_runcmd      = var.custom_cloud_config_runcmd
     ip                              = var.k3s_ip
     external_ip                     = var.k3s_external_ip
+    k3s_server                      = length(regexall("^server.*", var.install_k3s_exec)) > 0
     k3s_config = base64encode(<<EOT
 K3S_TOKEN=${var.cluster_token}
 K3S_URL=${var.k3s_url}

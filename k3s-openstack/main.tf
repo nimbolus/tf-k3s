@@ -84,20 +84,21 @@ resource "openstack_networking_port_v2" "mgmt" {
   }
 
 }
+
 resource "openstack_networking_floatingip_v2" "node" {
   count = var.floating_ip_pool == null ? 0 : 1
   pool  = var.floating_ip_pool
 }
 
 resource "openstack_compute_floatingip_associate_v2" "node" {
-  count       = length(openstack_compute_floatingip_associate_v2.node) > 0 ? 0 : 1
+  count       = length(openstack_networking_floatingip_v2.node) > 0 ? 1 : 0
   floating_ip = openstack_networking_floatingip_v2.node[0].address
   instance_id = openstack_compute_instance_v2.node.id
 }
 
 locals {
   node_ip          = openstack_compute_instance_v2.node.network.0.fixed_ip_v4
-  node_external_ip = length(openstack_compute_floatingip_associate_v2.node) > 0 ? openstack_networking_floatingip_v2.node[0].address : null
+  node_external_ip = length(openstack_networking_floatingip_v2.node) > 0 ? openstack_networking_floatingip_v2.node[0].address : null
   k3s_url          = var.k3s_join_existing ? var.k3s_url : "https://${local.node_ip}:6443"
-  k3s_external_url = var.k3s_join_existing ? "" : "https://${local.node_external_ip}:6443"
+  k3s_external_url = var.k3s_join_existing || local.node_external_ip == null ? "" : "https://${local.node_external_ip}:6443"
 }
