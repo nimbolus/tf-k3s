@@ -1,4 +1,4 @@
-# Terraform modules for K3s
+# Terraform Modules for K3s
 
 Provisions K3s nodes and is able to build a cluster from multiple nodes.
 
@@ -111,7 +111,7 @@ brew install coreutils
 ### Basic
 ```sh
 cd tests/basic
-go test -count=1 -v ./basic
+go test -count=1 -v
 ```
 
 ### OpenStack
@@ -119,7 +119,7 @@ go test -count=1 -v ./basic
 cd tests/ha-openstack
 cp env.sample .env
 $EDITOR .env
-go test -count=1 -v .
+go test -count=1 -v
 ```
 
 ### hcloud
@@ -127,5 +127,5 @@ go test -count=1 -v .
 cd tests/ha-hcloud
 cp env.sample .env
 $EDITOR .env
-go test -count=1 -v .
+go test -count=1 -v
 ```
