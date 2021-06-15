@@ -55,7 +55,7 @@ variable "server_properties" {
 }
 
 variable "server_stop_before_destroy" {
-  default     = true
+  default     = false
   description = "shutdown instance gracefully before destroying"
 }
 
