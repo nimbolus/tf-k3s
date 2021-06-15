@@ -1,4 +1,4 @@
-# Terraform Modules for K3s
+# Terraform modules for K3s
 
 Provisions K3s nodes and is able to build a cluster from multiple nodes.
 
@@ -97,7 +97,7 @@ module "bootstrap_auth" {
 
 ## Examples
 - [basic](examples/basic/main.tf): basic usage of the k3s module with one server and one agent node
-- [ha-hcloud](examples/ha-hcloud/main.tf): 3 Servers and 1 Agent with bootstrap token on hcloud
+- [ha-hcloud](examples/ha-hcloud/main.tf): 3 Servers and 1 Agent with bootstrap token on Hetzner Cloud
 - [ha-openstack](examples/ha-openstack/main.tf): 3 Servers and 1 Agent with bootstrap token on OpenStack
 
 ## Requirements
@@ -119,7 +119,7 @@ go test -count=1 -v ./basic
 cd tests/ha-openstack
 cp env.sample .env
 $EDITOR .env
-go test -count=1 -v ./ha-openstack
+go test -count=1 -v .
 ```
 
 ### hcloud
@@ -127,5 +127,5 @@ go test -count=1 -v ./ha-openstack
 cd tests/ha-hcloud
 cp env.sample .env
 $EDITOR .env
-go test -count=1 -v ./ha-hcloud
+go test -count=1 -v .
 ```
