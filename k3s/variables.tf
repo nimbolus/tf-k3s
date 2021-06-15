@@ -12,13 +12,20 @@ variable "cluster_token" {
 }
 
 variable "k3s_ip" {
-  default     = ""
-  description = "ip the k8s api will be available on"
+  type        = string
+  default     = null
+  description = "ip the k3s node uses cluster-internally"
 }
 
 variable "k3s_url" {
   default     = ""
   description = "api url of the existing cluster this node should join to"
+}
+
+variable "k3s_external_ip" {
+  type        = string
+  default     = null
+  description = "external ip address of the k3s node"
 }
 
 variable "install_k3s_exec" {
@@ -46,4 +53,9 @@ variable "custom_cloud_config_write_files" {
 
 variable "custom_cloud_config_runcmd" {
   default = ""
+}
+
+variable "persistent_volume_dev" {
+  default     = ""
+  description = "optional device for persistent data (e.g. /dev/vdb)"
 }

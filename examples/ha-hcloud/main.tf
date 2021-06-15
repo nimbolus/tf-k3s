@@ -15,36 +15,25 @@ resource "random_password" "bootstrap_token_secret" {
   special = false
 }
 
-module "secgroup" {
-  source = "../../k3s-openstack/security-group"
-}
-
 locals {
   token                  = "${random_password.bootstrap_token_id.result}.${random_password.bootstrap_token_secret.result}"
-  common_k3s_server_exec = "--kube-apiserver-arg=\"enable-bootstrap-token-auth\" --disable traefik --node-label az=${var.availability_zone}"
+  common_k3s_server_exec = "--kube-apiserver-arg=\"enable-bootstrap-token-auth\" --disable traefik --node-label az=ex1"
 }
 
 module "bootstrap_auth" {
-  source     = "../../bootstrap-auth"
-  depends_on = [module.secgroup]
+  source = "../../bootstrap-auth"
 
   k3s_url = module.server1.k3s_external_url
   token   = local.token
 }
 
 module "server1" {
-  source = "../../k3s-openstack"
+  source = "../../k3s-hcloud"
 
-  name               = "k3s-server-1"
-  image_name         = var.image_name
-  flavor_name        = "m1.small"
-  availability_zone  = var.availability_zone
-  keypair_name       = openstack_compute_keypair_v2.k3s.name
-  network_id         = var.network_id
-  subnet_id          = var.subnet_id
-  security_group_ids = [module.secgroup.id]
-  data_volume_size   = 1
-  floating_ip_pool   = var.floating_ip_pool
+  name          = "k3s-server-1"
+  keypair_name  = hcloud_ssh_key.k3s.name
+  network_id    = hcloud_network_subnet.k3s.network_id
+  network_range = hcloud_network.k3s.ip_range
 
   cluster_token          = random_password.cluster_token.result
   install_k3s_exec       = "server --cluster-init ${local.common_k3s_server_exec}"
@@ -53,19 +42,14 @@ module "server1" {
 }
 
 module "servers" {
-  source = "../../k3s-openstack"
+  source = "../../k3s-hcloud"
 
   count = 2
 
-  name               = "k3s-server-${count.index + 2}"
-  image_name         = var.image_name
-  flavor_name        = "m1.small"
-  availability_zone  = var.availability_zone
-  keypair_name       = openstack_compute_keypair_v2.k3s.name
-  network_id         = var.network_id
-  subnet_id          = var.subnet_id
-  security_group_ids = [module.secgroup.id]
-  data_volume_size   = 1
+  name          = "k3s-server-${count.index + 2}"
+  keypair_name  = hcloud_ssh_key.k3s.name
+  network_id    = hcloud_network_subnet.k3s.network_id
+  network_range = hcloud_network.k3s.ip_range
 
   k3s_join_existing = true
   k3s_url           = module.server1.k3s_url
@@ -73,25 +57,20 @@ module "servers" {
   install_k3s_exec  = "server ${local.common_k3s_server_exec}"
 }
 
-module "agents" {
-  source = "../../k3s-openstack"
+module "agent" {
+  source = "../../k3s-hcloud"
 
   count = 1
 
-  name               = "k3s-agent-${count.index + 1}"
-  image_name         = var.image_name
-  flavor_name        = "m1.small"
-  availability_zone  = var.availability_zone
-  keypair_name       = openstack_compute_keypair_v2.k3s.name
-  network_id         = var.network_id
-  subnet_id          = var.subnet_id
-  security_group_ids = [module.secgroup.id]
-  data_volume_size   = 1
+  name          = "k3s-agent-${count.index + 1}"
+  keypair_name  = hcloud_ssh_key.k3s.name
+  network_id    = hcloud_network_subnet.k3s.network_id
+  network_range = hcloud_network.k3s.ip_range
 
   k3s_join_existing = true
   k3s_url           = module.server1.k3s_url
   cluster_token     = random_password.cluster_token.result
-  install_k3s_exec  = "agent --node-label az=${var.availability_zone}"
+  install_k3s_exec  = "agent --node-label az=ex1"
 }
 
 output "cluster_token" {

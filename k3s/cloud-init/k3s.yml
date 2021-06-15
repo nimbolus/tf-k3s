@@ -1,12 +1,14 @@
 #cloud-config
 
+%{if persistent_volume_dev != "" }
 fs_setup:
   - label: k3s-data
     filesystem: ext4
-    device: /dev/vdb
+    device: ${persistent_volume_dev}
 
 mounts:
-  - [vdb, /mnt/persistent]
+  - [${persistent_volume_dev}, /mnt/persistent]
+%{endif}
 
 write_files:
   - path: /root/k3s.env
@@ -26,6 +28,12 @@ runcmd:
   - ln -s /mnt/persistent/etc/rancher /etc/rancher
   # install k3s
   - set -a; . /root/k3s.env; set +a
+%{if ip != null }
+  - export INSTALL_K3S_EXEC="$INSTALL_K3S_EXEC --node-ip=${ip}%{if k3s_server} --advertise-address=${ip}%{endif}"
+%{endif}
+%{if external_ip != null }
+  - export INSTALL_K3S_EXEC="$INSTALL_K3S_EXEC --node-external-ip=${external_ip}"
+%{endif}
   - curl -sfL https://get.k3s.io | sh -
   # install cni plugins
   - wget -O /tmp/cni-plugins.tgz https://github.com/containernetworking/plugins/releases/download/v0.9.0/cni-plugins-linux-amd64-v0.9.0.tgz

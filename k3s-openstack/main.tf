@@ -21,13 +21,15 @@ module "k3s" {
   name                            = var.name
   k3s_join_existing               = var.k3s_join_existing
   cluster_token                   = var.cluster_token
-  k3s_ip                          = var.k3s_join_existing ? var.k3s_ip : openstack_networking_port_v2.mgmt.all_fixed_ips[0]
+  k3s_ip                          = openstack_networking_port_v2.mgmt.all_fixed_ips[0]
   k3s_url                         = var.k3s_url
+  k3s_external_ip                 = var.k3s_external_ip != null ? var.k3s_external_ip : local.node_external_ip
   install_k3s_exec                = var.install_k3s_exec
   custom_cloud_config_write_files = var.custom_cloud_config_write_files
   custom_cloud_config_runcmd      = var.custom_cloud_config_runcmd
   bootstrap_token_id              = var.bootstrap_token_id
   bootstrap_token_secret          = var.bootstrap_token_secret
+  persistent_volume_dev           = "/dev/vdb"
 }
 
 resource "openstack_compute_instance_v2" "node" {
@@ -79,11 +81,25 @@ resource "openstack_networking_port_v2" "mgmt" {
 
   fixed_ip {
     subnet_id  = var.subnet_id
-    ip_address = var.server_ip_address
+    ip_address = var.k3s_ip
   }
 
 }
 
+resource "openstack_networking_floatingip_v2" "node" {
+  count = var.floating_ip_pool == null ? 0 : 1
+  pool  = var.floating_ip_pool
+}
+
+resource "openstack_compute_floatingip_associate_v2" "node" {
+  count       = length(openstack_networking_floatingip_v2.node) > 0 ? 1 : 0
+  floating_ip = openstack_networking_floatingip_v2.node[0].address
+  instance_id = openstack_compute_instance_v2.node.id
+}
+
 locals {
-  node_ip = openstack_compute_instance_v2.node.network.0.fixed_ip_v4
+  node_ip          = openstack_compute_instance_v2.node.network.0.fixed_ip_v4
+  node_external_ip = length(openstack_networking_floatingip_v2.node) > 0 ? openstack_networking_floatingip_v2.node[0].address : null
+  k3s_url          = var.k3s_join_existing ? var.k3s_url : "https://${local.node_ip}:6443"
+  k3s_external_url = (var.k3s_join_existing || local.node_external_ip == null) ? "" : "https://${local.node_external_ip}:6443"
 }

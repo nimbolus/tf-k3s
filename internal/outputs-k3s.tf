@@ -2,8 +2,16 @@ output "node_ip" {
   value = local.node_ip
 }
 
+output "node_external_ip" {
+  value = local.node_external_ip
+}
+
 output "k3s_url" {
-  value = module.k3s.k3s_url
+  value = local.k3s_url
+}
+
+output "k3s_external_url" {
+  value = local.k3s_external_url
 }
 
 output "user_data" {

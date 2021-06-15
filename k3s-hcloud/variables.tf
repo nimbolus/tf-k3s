@@ -19,6 +19,10 @@ variable "network_id" {
   type = string
 }
 
+variable "network_range" {
+  type = string
+}
+
 variable "data_volume_size" {
   default = 10
 }
