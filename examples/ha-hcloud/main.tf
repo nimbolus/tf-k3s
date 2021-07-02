@@ -20,11 +20,9 @@ locals {
   common_k3s_server_exec = "--kube-apiserver-arg=\"enable-bootstrap-token-auth\" --disable traefik --node-label az=ex1"
 }
 
-module "bootstrap_auth" {
-  source = "../../bootstrap-auth"
-
-  k3s_url = module.server1.k3s_external_url
-  token   = local.token
+data "k8sbootstrap_auth" "auth" {
+  server = module.server1.k3s_external_url
+  token  = local.token
 }
 
 module "server1" {
@@ -105,16 +103,16 @@ output "token" {
 }
 
 output "ca_crt" {
-  value = module.bootstrap_auth.ca_crt
+  value = data.k8sbootstrap_auth.auth.ca_crt
 }
 
 output "kubeconfig" {
-  value     = module.bootstrap_auth.kubeconfig
+  value     = data.k8sbootstrap_auth.auth.kubeconfig
   sensitive = true
 }
 
 provider "kubernetes" {
   host                   = module.server1.k3s_url
   token                  = local.token
-  cluster_ca_certificate = module.bootstrap_auth.ca_crt
+  cluster_ca_certificate = data.k8sbootstrap_auth.auth.ca_crt
 }

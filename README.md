@@ -80,18 +80,15 @@ module "server" {
 }
 ```
 
-### bootstrap-auth
+## bootstrap-auth
 To access the cluster an optional bootstrap token can be installed on the cluster. To install the token specify the parameters `bootstrap_token_id` and `bootstrap_token_secret` on the server that initializes the cluster.
-For ease of use this module can be used to retrieve the CA certificate from the cluster. The module also outputs a kubeconfig with the bootstrap token.
-Please keep in mind that the connection to retrieve the CA certificate cannot be secure as the certificate cannot be verified. Additionally this module makes use of the [scottwinkler/shell](https://github.com/scottwinkler/terraform-provider-shell) provider. Please make sure you only supply trusted values to the module.
+For ease of use the provider [nimbolus/k8sbootstrap](https://registry.terraform.io/providers/nimbolus/k8sbootstrap/latest) can be used to retrieve the CA certificate from the cluster. The provider can also output a kubeconfig with the bootstrap token.
 
 ```terraform
-module "bootstrap_auth" {
-  source     = "git::https://github.com/nimbolus/tf-k3s.git//bootstrap-auth"
+data "k8sbootstrap_auth" "auth" {
   // depends_on = [module.secgroup] // if using OpenStack
-
-  k3s_url = module.server1.k3s_external_url
-  token   = local.token
+  server = module.server1.k3s_external_url
+  token  = local.token
 }
 ```
 
@@ -99,13 +96,6 @@ module "bootstrap_auth" {
 - [basic](examples/basic/main.tf): basic usage of the k3s module with one server and one agent node
 - [ha-hcloud](examples/ha-hcloud/main.tf): 3 Servers and 1 Agent with bootstrap token on Hetzner Cloud
 - [ha-openstack](examples/ha-openstack/main.tf): 3 Servers and 1 Agent with bootstrap token on OpenStack
-
-## Requirements
-MacOS users need to install `coreutils` for the `timeout` command used by the [bootstrap-auth](./bootstrap-auth) module:
-
-```sh
-brew install coreutils
-```
 
 ## Tests
 ### Basic
@@ -119,6 +109,7 @@ go test -count=1 -v
 cd tests/ha-openstack
 cp env.sample .env
 $EDITOR .env
+source .env
 go test -count=1 -v
 ```
 
@@ -127,5 +118,6 @@ go test -count=1 -v
 cd tests/ha-hcloud
 cp env.sample .env
 $EDITOR .env
+source .env
 go test -count=1 -v
 ```
