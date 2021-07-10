@@ -2,6 +2,7 @@ resource "hcloud_volume" "node" {
   name     = "${var.name}-data"
   location = var.location
   size     = var.data_volume_size
+  labels   = var.labels
 }
 
 locals {
@@ -28,12 +29,14 @@ module "k3s" {
 }
 
 resource "hcloud_server" "node" {
-  name        = var.name
-  image       = var.image_name
-  server_type = var.server_type
-  location    = var.location
-  ssh_keys    = [var.keypair_name]
-  user_data   = module.k3s.user_data
+  name         = var.name
+  image        = var.image_name
+  server_type  = var.server_type
+  location     = var.location
+  ssh_keys     = [var.keypair_name]
+  user_data    = module.k3s.user_data
+  labels       = var.labels
+  firewall_ids = var.firewall_ids
 }
 
 resource "hcloud_volume_attachment" "node" {

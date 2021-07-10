@@ -29,7 +29,7 @@ runcmd:
   # install k3s
   - set -a; . /root/k3s.env; set +a
 %{if ip != null }
-  - export INSTALL_K3S_EXEC="$INSTALL_K3S_EXEC --node-ip=${ip}%{if k3s_server} --advertise-address=${ip}%{endif}"
+  - export INSTALL_K3S_EXEC="$INSTALL_K3S_EXEC --node-ip=${ip} --tls-san=${ip}"
 %{endif}
 %{if external_ip != null }
   - export INSTALL_K3S_EXEC="$INSTALL_K3S_EXEC --node-external-ip=${external_ip}"
@@ -43,4 +43,4 @@ runcmd:
   - mkdir -p /var/lib/rancher/k3s/server/manifests/
   - cp /root/k3s-bootstrap.yaml /var/lib/rancher/k3s/server/manifests/
 %{endif}
-${indent(2, custom_cloud_config_runcmd)}
+  ${indent(2, custom_cloud_config_runcmd)}

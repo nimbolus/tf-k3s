@@ -15,6 +15,16 @@ variable "keypair_name" {
   default = null
 }
 
+variable "labels" {
+  type    = map(string)
+  default = {}
+}
+
+variable "firewall_ids" {
+  type    = list(number)
+  default = []
+}
+
 variable "network_id" {
   type = string
 }
