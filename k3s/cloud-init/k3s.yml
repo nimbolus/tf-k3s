@@ -19,7 +19,7 @@ write_files:
     content: ${k3s_bootstrap_manifest_b64}
     encoding: b64
 %{endif}
-${indent(2, custom_cloud_config_write_files)}
+  ${indent(2, custom_cloud_config_write_files)}
 
 runcmd:
   # setup persistence
@@ -41,6 +41,6 @@ runcmd:
   - tar -xzC /opt/cni/bin -f /tmp/cni-plugins.tgz
 %{if k3s_bootstrap_manifest_b64 != "" }
   - mkdir -p /var/lib/rancher/k3s/server/manifests/
-  - cp /root/k3s-bootstrap.yaml /var/lib/rancher/k3s/server/manifests/
+  - mv /root/k3s-bootstrap.yaml /var/lib/rancher/k3s/server/manifests/
 %{endif}
   ${indent(2, custom_cloud_config_runcmd)}
