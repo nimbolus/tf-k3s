@@ -28,6 +28,14 @@ resource "openstack_networking_secgroup_rule_v2" "internal_udp" {
   security_group_id = local.security_group_id
 }
 
+resource "openstack_networking_secgroup_rule_v2" "internal_icmp" {
+  direction         = "ingress"
+  ethertype         = "IPv4"
+  protocol          = "icmp"
+  remote_group_id   = local.security_group_id
+  security_group_id = local.security_group_id
+}
+
 resource "openstack_networking_secgroup_rule_v2" "ssh" {
   direction         = "ingress"
   ethertype         = "IPv4"
