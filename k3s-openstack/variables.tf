@@ -64,3 +64,7 @@ variable "floating_ip_pool" {
   default     = null
   description = "if defined a floating ip will be assigned to the node and registered as k3s_external_ip"
 }
+
+variable "server_group_id" {
+  default = null
+}
