@@ -43,6 +43,10 @@ resource "openstack_compute_instance_v2" "node" {
   user_data           = module.k3s.user_data
   stop_before_destroy = var.server_stop_before_destroy
 
+  scheduler_hints {
+    group = var.server_group_id
+  }
+
   network {
     port           = openstack_networking_port_v2.mgmt.id
     access_network = true
