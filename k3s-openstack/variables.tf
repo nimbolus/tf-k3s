@@ -2,8 +2,20 @@ variable "image_name" {
   default = "ubuntu-20.04"
 }
 
+variable "image_id" {
+  type        = string
+  default     = null
+  description = "instead of a image name, the id can be given"
+}
+
 variable "flavor_name" {
   default = "m1.small"
+}
+
+variable "flavor_id" {
+  type        = string
+  default     = null
+  description = "instead of a flavor name, the id can be given"
 }
 
 variable "availability_zone" {

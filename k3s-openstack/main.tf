@@ -1,8 +1,12 @@
 data "openstack_compute_flavor_v2" "k3s" {
+  count = var.flavor_id == null ? 1 : 0
+
   name = var.flavor_name
 }
 
 data "openstack_images_image_v2" "k3s" {
+  count = var.image_id == null ? 1 : 0
+
   name        = var.image_name
   most_recent = true
 }
@@ -34,8 +38,8 @@ module "k3s" {
 
 resource "openstack_compute_instance_v2" "node" {
   name                = var.name
-  image_id            = data.openstack_images_image_v2.k3s.id
-  flavor_id           = data.openstack_compute_flavor_v2.k3s.id
+  image_id            = var.image_id == null ? data.openstack_images_image_v2.k3s.0.id : var.image_id
+  flavor_id           = var.flavor_id == null ? data.openstack_compute_flavor_v2.k3s.0.id : var.flavor_id
   key_pair            = var.keypair_name
   metadata            = var.server_properties
   config_drive        = var.config_drive
@@ -61,7 +65,7 @@ resource "openstack_compute_instance_v2" "node" {
 
   block_device {
     boot_index            = 0
-    uuid                  = data.openstack_images_image_v2.k3s.id
+    uuid                  = var.image_id == null ? data.openstack_images_image_v2.k3s.0.id : var.image_id
     delete_on_termination = true
     destination_type      = "local"
     source_type           = "image"
