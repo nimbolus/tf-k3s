@@ -7,12 +7,25 @@ data "openstack_images_image_v2" "k3s" {
   most_recent = true
 }
 
+resource "openstack_blockstorage_volume_v3" "root" {
+  count = var.root_volume ? 1 : 0
+
+  name                 = "${var.name}-root"
+  availability_zone    = var.availability_zone
+  volume_type          = var.root_volume_type
+  size                 = var.root_volume_size
+  enable_online_resize = var.volume_enable_online_resize
+  image_id             = data.openstack_images_image_v2.k3s.id
+}
+
 resource "openstack_blockstorage_volume_v3" "data" {
+  count = var.data_volume ? 1 : 0
+
   name                 = "${var.name}-data"
   availability_zone    = var.availability_zone
   volume_type          = var.data_volume_type
   size                 = var.data_volume_size
-  enable_online_resize = var.data_volume_enable_online_resize
+  enable_online_resize = var.volume_enable_online_resize
 }
 
 module "k3s" {
@@ -61,18 +74,21 @@ resource "openstack_compute_instance_v2" "node" {
 
   block_device {
     boot_index            = 0
-    uuid                  = data.openstack_images_image_v2.k3s.id
-    delete_on_termination = true
-    destination_type      = "local"
-    source_type           = "image"
+    uuid                  = var.root_volume ? openstack_blockstorage_volume_v3.root.0.id : data.openstack_images_image_v2.k3s.id
+    destination_type      = var.root_volume ? "volume" : "local"
+    source_type           = var.root_volume ? "volume" : "image"
+    delete_on_termination = var.root_volume ? false : true
   }
 
-  block_device {
-    boot_index            = -1
-    uuid                  = openstack_blockstorage_volume_v3.data.id
-    source_type           = "volume"
-    destination_type      = "volume"
-    delete_on_termination = false
+  dynamic "block_device" {
+    for_each = toset(openstack_blockstorage_volume_v3.data)
+    content {
+      boot_index            = -1
+      uuid                  = openstack_blockstorage_volume_v3.data[block_device.key].id
+      source_type           = "volume"
+      destination_type      = "volume"
+      delete_on_termination = false
+    }
   }
 }
 

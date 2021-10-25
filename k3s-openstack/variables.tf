@@ -36,6 +36,22 @@ variable "additional_port_ids" {
   default = []
 }
 
+variable "root_volume" {
+  default = false
+}
+
+variable "root_volume_type" {
+  default = "__DEFAULT__"
+}
+
+variable "root_volume_size" {
+  default = 10
+}
+
+variable "data_volume" {
+  default = true
+}
+
 variable "data_volume_type" {
   default = "__DEFAULT__"
 }
@@ -44,7 +60,7 @@ variable "data_volume_size" {
   default = 10
 }
 
-variable "data_volume_enable_online_resize" {
+variable "volume_enable_online_resize" {
   default = true
 }
 
