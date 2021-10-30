@@ -53,6 +53,7 @@ resource "hcloud_server_network" "node" {
 
 locals {
   node_ip          = hcloud_server_network.node.ip
+  node_ipv6        = hcloud_server.node.ipv6_address
   node_external_ip = hcloud_server.node.ipv4_address
   k3s_url          = var.k3s_join_existing ? var.k3s_url : "https://${local.node_ip}:6443"
   k3s_external_url = var.k3s_join_existing ? "" : "https://${local.node_external_ip}:6443"
