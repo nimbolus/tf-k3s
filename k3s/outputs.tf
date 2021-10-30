@@ -16,7 +16,7 @@ output "user_data" {
     k3s_config = base64encode(<<-EOT
       K3S_TOKEN=${var.cluster_token}
       K3S_URL=${var.k3s_url}
-      INSTALL_K3S_EXEC="${var.install_k3s_exec}"
+      INSTALL_K3S_EXEC="${join(" ", var.k3s_args)}"
       %{ if var.k3s_version != null ~}
       INSTALL_K3S_VERSION=${var.k3s_version}
       %{ endif ~}

@@ -20,7 +20,7 @@ module "k3s" {
   k3s_ip                          = var.k3s_ip != null ? var.k3s_ip : local.internal_ip_command
   k3s_url                         = var.k3s_url
   k3s_external_ip                 = var.k3s_external_ip != null ? var.k3s_external_ip : local.external_ip_command
-  install_k3s_exec                = var.install_k3s_exec
+  k3s_args                        = var.k3s_args
   custom_cloud_config_write_files = var.custom_cloud_config_write_files
   custom_cloud_config_runcmd      = var.custom_cloud_config_runcmd
   bootstrap_token_id              = var.bootstrap_token_id

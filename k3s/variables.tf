@@ -34,8 +34,9 @@ variable "k3s_external_ip" {
   description = "external ip address of the k3s node"
 }
 
-variable "install_k3s_exec" {
-  default = ""
+variable "k3s_args" {
+  default     = []
+  description = "command line flags for launching k3s in the service"
 }
 
 variable "bootstrap_token_enabled" {
