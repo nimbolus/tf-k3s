@@ -17,10 +17,14 @@ This module provides the templating of the user_data for use with cloud-init.
 module "k3s_server" {
   source = "git::https://github.com/nimbolus/tf-k3s.git//k3s"
 
-  name             = "k3s-server"
-  cluster_token    = "abcdef"
-  k3s_ip           = "10.11.12.13"
-  install_k3s_exec = "server --disable traefik --node-label az=ex1"
+  name          = "k3s-server"
+  cluster_token = "abcdef"
+  k3s_ip        = "10.11.12.13"
+  k3s_args = [
+    "server",
+    "--disable", "traefik",
+    "--node-label", "az=ex1",
+  ]
 }
 
 output "server_user_data" {
@@ -45,8 +49,14 @@ module "server" {
   subnet_id          = var.subnet_id
   security_group_ids = [module.secgroup.id]
 
-  cluster_token          = "abcdef"
-  install_k3s_exec       = "server --disable traefik --node-label az=ex" // if using bootstrap-auth include "--kube-apiserver-arg=\"enable-bootstrap-token-auth\""
+  cluster_token = "abcdef"
+  k3s_args = [
+    "server",
+    "--disable", "traefik",
+    "--node-label", "az=ex1",
+    # if using bootstrap-auth include
+    "--kube-apiserver-arg", "enable-bootstrap-token-auth",
+  ]
   bootstrap_token_id     = "012345"
   bootstrap_token_secret = "0123456789abcdef"
 }
@@ -73,8 +83,14 @@ module "server" {
   network_id    = var.network_id
   network_range = var.ip_range
 
-  cluster_token          = "abcdef"
-  install_k3s_exec       = "server --disable traefik --node-label az=ex" // if using bootstrap-auth include "--kube-apiserver-arg=\"enable-bootstrap-token-auth\"""
+  cluster_token = "abcdef"
+  k3s_args = [
+    "server",
+    "--disable", "traefik",
+    "--node-label", "az=ex1",
+    # if using bootstrap-auth include
+    "--kube-apiserver-arg", "enable-bootstrap-token-auth",
+  ]
   bootstrap_token_id     = "012345"
   bootstrap_token_secret = "0123456789abcdef"
 }

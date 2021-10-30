@@ -16,8 +16,12 @@ resource "random_password" "bootstrap_token_secret" {
 }
 
 locals {
-  token                  = "${random_password.bootstrap_token_id.result}.${random_password.bootstrap_token_secret.result}"
-  common_k3s_server_exec = "--kube-apiserver-arg=\"enable-bootstrap-token-auth\" --disable traefik --node-label az=ex1"
+  token = "${random_password.bootstrap_token_id.result}.${random_password.bootstrap_token_secret.result}"
+  common_k3s_args = [
+    "--kube-apiserver-arg", "enable-bootstrap-token-auth",
+    "--disable", "traefik",
+    "--node-label", "az=ex1",
+  ]
 }
 
 data "k8sbootstrap_auth" "auth" {
@@ -34,7 +38,7 @@ module "server1" {
   network_range = hcloud_network.k3s.ip_range
 
   cluster_token          = random_password.cluster_token.result
-  install_k3s_exec       = "server --cluster-init ${local.common_k3s_server_exec}"
+  k3s_args               = concat(["server", "--cluster-init"], local.common_k3s_args)
   bootstrap_token_id     = random_password.bootstrap_token_id.result
   bootstrap_token_secret = random_password.bootstrap_token_secret.result
 }
@@ -52,7 +56,7 @@ module "servers" {
   k3s_join_existing = true
   k3s_url           = module.server1.k3s_url
   cluster_token     = random_password.cluster_token.result
-  install_k3s_exec  = "server ${local.common_k3s_server_exec}"
+  k3s_args          = concat(["server"], local.common_k3s_args)
 }
 
 module "agent" {
@@ -68,7 +72,7 @@ module "agent" {
   k3s_join_existing = true
   k3s_url           = module.server1.k3s_url
   cluster_token     = random_password.cluster_token.result
-  install_k3s_exec  = "agent --node-label az=ex1"
+  k3s_args          = ["agent", "--node-label", "az=ex1"]
 }
 
 output "cluster_token" {
