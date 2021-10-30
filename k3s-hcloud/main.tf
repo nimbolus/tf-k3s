@@ -26,6 +26,8 @@ module "k3s" {
   bootstrap_token_id              = var.bootstrap_token_id
   bootstrap_token_secret          = var.bootstrap_token_secret
   persistent_volume_dev           = "/dev/disk/by-id/scsi-0HC_Volume_${hcloud_volume.node.id}"
+  k3os                            = var.k3os
+  k3os_config                     = var.k3os_config
 }
 
 resource "hcloud_server" "node" {

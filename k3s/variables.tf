@@ -70,3 +70,11 @@ variable "persistent_volume_dev" {
 variable "cni_plugins_version" {
   default = "v0.9.0"
 }
+
+variable "k3os" {
+  default = false
+}
+
+variable "k3os_config" {
+  default = {}
+}

@@ -7,7 +7,18 @@ locals {
 }
 
 output "user_data" {
-  value = templatefile("${path.module}/cloud-init/k3s.yml", {
+  value = var.k3os ? templatefile("${path.module}/cloud-init/k3os.yml", {
+    custom_cloud_config_write_files = var.custom_cloud_config_write_files
+    custom_cloud_config_runcmd      = var.custom_cloud_config_runcmd
+    ip                              = var.k3s_ip
+    external_ip                     = var.k3s_external_ip
+    k3s_token                       = var.cluster_token
+    k3s_url                         = var.k3s_url
+    k3s_args                        = yamlencode(var.k3s_args)
+    k3s_bootstrap_manifest_b64      = local.k3s_bootstrap_manifest_b64
+    cni_plugins_version             = var.cni_plugins_version
+    k3os_config                     = yamlencode(var.k3os_config)
+    }) : templatefile("${path.module}/cloud-init/k3s.yml", {
     custom_cloud_config_write_files = var.custom_cloud_config_write_files
     custom_cloud_config_runcmd      = var.custom_cloud_config_runcmd
     ip                              = var.k3s_ip
