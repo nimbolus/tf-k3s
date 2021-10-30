@@ -11,6 +11,12 @@ variable "cluster_token" {
   default = null
 }
 
+variable "k3s_version" {
+  type        = string
+  default     = null
+  description = "version of k3s to download. If not defined stable channel is used"
+}
+
 variable "k3s_ip" {
   type        = string
   default     = null
@@ -58,4 +64,8 @@ variable "custom_cloud_config_runcmd" {
 variable "persistent_volume_dev" {
   default     = ""
   description = "optional device for persistent data (e.g. /dev/vdb)"
+}
+
+variable "cni_plugins_version" {
+  default = "v0.9.0"
 }
