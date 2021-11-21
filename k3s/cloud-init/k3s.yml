@@ -28,8 +28,11 @@ runcmd:
   - ln -s /mnt/persistent/etc/rancher /etc/rancher
   # install k3s
   - set -a; . /root/k3s.env; set +a
-%{if ip != null~}
+%{if ip != null && is_server~}
   - export INSTALL_K3S_EXEC="$INSTALL_K3S_EXEC --node-ip=${ip} --tls-san=${ip}"
+%{endif~}
+%{if ip != null && !is_server~}
+  - export INSTALL_K3S_EXEC="$INSTALL_K3S_EXEC --node-ip=${ip}"
 %{endif~}
 %{if external_ip != null~}
   - export INSTALL_K3S_EXEC="$INSTALL_K3S_EXEC --node-external-ip=${external_ip}"
