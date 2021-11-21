@@ -10,10 +10,14 @@ resource "random_password" "cluster_token" {
 module "k3s_server" {
   source = "../../k3s"
 
-  name             = "k3s-server"
-  cluster_token    = random_password.cluster_token.result
-  k3s_ip           = var.server_ip
-  install_k3s_exec = "server --disable traefik --node-label az=ex1"
+  name          = "k3s-server"
+  cluster_token = random_password.cluster_token.result
+  k3s_ip        = var.server_ip
+  k3s_args = [
+    "server",
+    "--disable", "traefik",
+    "--node-label", "az=ex1",
+  ]
 }
 
 locals {
@@ -28,7 +32,10 @@ module "k3s_agent" {
   k3s_url           = local.k3s_url
   cluster_token     = random_password.cluster_token.result
   k3s_ip            = var.agent_ip
-  install_k3s_exec  = "agent --node-label az=ex1"
+  k3s_args = [
+    "agent",
+    "--node-label", "az=ex1",
+  ]
 }
 
 output "cluster_token" {

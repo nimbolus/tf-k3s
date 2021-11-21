@@ -2,6 +2,10 @@ output "node_ip" {
   value = local.node_ip
 }
 
+output "node_ipv6" {
+  value = local.node_ipv6
+}
+
 output "node_external_ip" {
   value = local.node_external_ip
 }

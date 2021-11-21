@@ -1,6 +1,6 @@
 #cloud-config
 
-%{if persistent_volume_dev != "" }
+%{if persistent_volume_dev != ""~}
 fs_setup:
   - label: k3s-data
     filesystem: ext4
@@ -8,17 +8,17 @@ fs_setup:
 
 mounts:
   - [${persistent_volume_dev}, /mnt/persistent]
-%{endif}
+%{endif~}
 
 write_files:
   - path: /root/k3s.env
     content: ${k3s_config}
     encoding: b64
-%{if k3s_bootstrap_manifest_b64 != "" }
+%{if k3s_bootstrap_manifest_b64 != ""~}
   - path: /root/k3s-bootstrap.yaml
     content: ${k3s_bootstrap_manifest_b64}
     encoding: b64
-%{endif}
+%{endif~}
   ${indent(2, custom_cloud_config_write_files)}
 
 runcmd:
@@ -28,19 +28,19 @@ runcmd:
   - ln -s /mnt/persistent/etc/rancher /etc/rancher
   # install k3s
   - set -a; . /root/k3s.env; set +a
-%{if ip != null }
+%{if ip != null~}
   - export INSTALL_K3S_EXEC="$INSTALL_K3S_EXEC --node-ip=${ip} --tls-san=${ip}"
-%{endif}
-%{if external_ip != null }
+%{endif~}
+%{if external_ip != null~}
   - export INSTALL_K3S_EXEC="$INSTALL_K3S_EXEC --node-external-ip=${external_ip}"
-%{endif}
+%{endif~}
   - curl -sfL https://get.k3s.io | sh -
   # install cni plugins
-  - wget -O /tmp/cni-plugins.tgz https://github.com/containernetworking/plugins/releases/download/v0.9.0/cni-plugins-linux-amd64-v0.9.0.tgz
+  - wget -O /tmp/cni-plugins.tgz https://github.com/containernetworking/plugins/releases/download/${cni_plugins_version}/cni-plugins-linux-amd64-${cni_plugins_version}.tgz
   - mkdir -p /opt/cni/bin
   - tar -xzC /opt/cni/bin -f /tmp/cni-plugins.tgz
-%{if k3s_bootstrap_manifest_b64 != "" }
+%{if k3s_bootstrap_manifest_b64 != ""~}
   - mkdir -p /var/lib/rancher/k3s/server/manifests/
   - mv /root/k3s-bootstrap.yaml /var/lib/rancher/k3s/server/manifests/
-%{endif}
+%{endif~}
   ${indent(2, custom_cloud_config_runcmd)}

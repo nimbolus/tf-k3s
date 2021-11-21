@@ -12,6 +12,14 @@ variable "allow_remote_prefix" {
   default = "0.0.0.0/0"
 }
 
+variable "enable_ipv6" {
+  default = false
+}
+
+variable "allow_remote_prefix_v6" {
+  default = "::/0"
+}
+
 variable "port_ssh" { default = 22 }
 variable "port_api" { default = 6443 }
 variable "port_node_tcp_min" { default = 30000 }
