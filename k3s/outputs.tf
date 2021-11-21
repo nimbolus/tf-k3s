@@ -13,6 +13,7 @@ output "user_data" {
     ip                              = var.k3s_ip
     external_ip                     = var.k3s_external_ip
     persistent_volume_dev           = var.persistent_volume_dev
+    is_server                       = contains(var.k3s_args, "server")
     k3s_config = base64encode(<<-EOT
       K3S_TOKEN=${var.cluster_token}
       K3S_URL=${var.k3s_url}
