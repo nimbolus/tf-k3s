@@ -79,6 +79,12 @@ resource "openstack_compute_instance_v2" "node" {
     destination_type      = "volume"
     delete_on_termination = false
   }
+
+  lifecycle {
+    ignore_changes = [
+      block_device.0.uuid
+    ]
+  }
 }
 
 resource "openstack_networking_port_v2" "mgmt" {
