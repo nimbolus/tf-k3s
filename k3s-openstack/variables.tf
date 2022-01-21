@@ -8,6 +8,10 @@ variable "image_id" {
   description = "instead of a image name, the id can be given"
 }
 
+variable "image_scsi_bus" {
+  default = false
+}
+
 variable "flavor_name" {
   default = "m1.small"
 }
