@@ -1,3 +1,8 @@
+locals {
+  create_data_volume = var.data_volume_size > 0
+  data_volume_name   = var.image_scsi_bus ? "/dev/sdb" : "/dev/vdb"
+}
+
 data "openstack_compute_flavor_v2" "k3s" {
   count = var.flavor_id == null ? 1 : 0
 
@@ -12,6 +17,8 @@ data "openstack_images_image_v2" "k3s" {
 }
 
 resource "openstack_blockstorage_volume_v3" "data" {
+  count = local.create_data_volume && !var.ephemeral_data_volume ? 1 : 0
+
   name                 = "${var.name}-data"
   availability_zone    = var.availability_zone
   volume_type          = var.data_volume_type
@@ -35,7 +42,7 @@ module "k3s" {
   custom_cloud_config_runcmd      = var.custom_cloud_config_runcmd
   bootstrap_token_id              = var.bootstrap_token_id
   bootstrap_token_secret          = var.bootstrap_token_secret
-  persistent_volume_dev           =  var.image_scsi_bus ? "/dev/sdb" : "/dev/vdb"
+  persistent_volume_dev           = local.create_data_volume ? local.data_volume_name : ""
 }
 
 resource "openstack_compute_instance_v2" "node" {
@@ -73,12 +80,26 @@ resource "openstack_compute_instance_v2" "node" {
     source_type           = "image"
   }
 
-  block_device {
-    boot_index            = -1
-    uuid                  = openstack_blockstorage_volume_v3.data.id
-    source_type           = "volume"
-    destination_type      = "volume"
-    delete_on_termination = false
+  dynamic "block_device" {
+    for_each = local.create_data_volume && var.ephemeral_data_volume ? { "data" = { "size" = var.data_volume_size } } : {}
+    content {
+      boot_index            = -1
+      source_type           = "blank"
+      destination_type      = "local"
+      delete_on_termination = true
+      volume_size           = block_device.value["size"]
+    }
+  }
+
+  dynamic "block_device" {
+    for_each = openstack_blockstorage_volume_v3.data
+    content {
+      boot_index            = -1
+      uuid                  = block_device.value["id"]
+      source_type           = "volume"
+      destination_type      = "volume"
+      delete_on_termination = false
+    }
   }
 
   lifecycle {
