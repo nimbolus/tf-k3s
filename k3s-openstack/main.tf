@@ -26,6 +26,7 @@ module "k3s" {
   k3s_join_existing               = var.k3s_join_existing
   cluster_token                   = var.cluster_token
   k3s_version                     = var.k3s_version
+  k3s_channel                     = var.k3s_channel
   k3s_ip                          = openstack_networking_port_v2.mgmt.all_fixed_ips[0]
   k3s_url                         = var.k3s_url
   k3s_external_ip                 = var.k3s_external_ip != null ? var.k3s_external_ip : local.node_external_ip

@@ -20,6 +20,8 @@ output "user_data" {
       INSTALL_K3S_EXEC="${join(" ", var.k3s_args)}"
       %{if var.k3s_version != null~}
       INSTALL_K3S_VERSION=${var.k3s_version}
+      %{else~}
+      INSTALL_K3S_CHANNEL=${var.k3s_channel}
       %{endif~}
       EOT
     )

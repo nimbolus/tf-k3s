@@ -17,6 +17,11 @@ variable "k3s_version" {
   description = "version of k3s to download. If not defined stable channel is used"
 }
 
+variable "k3s_channel" {
+  default     = "stable"
+  description = "channel to use for fetching k3s download URL, could be stable, latest or testing (overridden by k3s_version)"
+}
+
 variable "k3s_ip" {
   type        = string
   default     = null
