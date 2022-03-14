@@ -52,12 +52,18 @@ variable "additional_port_ids" {
   default = []
 }
 
+variable "ephemeral_data_volume" {
+  default     = false
+  description = "use an ephemeral disk for data, which will be deleted on instance termination"
+}
+
 variable "data_volume_type" {
   default = "__DEFAULT__"
 }
 
 variable "data_volume_size" {
-  default = 10
+  default     = 10
+  description = "data volume size in GB, can be set to 0 to omit data volume creation"
 }
 
 variable "data_volume_enable_online_resize" {
