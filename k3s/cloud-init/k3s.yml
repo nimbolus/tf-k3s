@@ -26,6 +26,9 @@ runcmd:
   - mkdir -p /mnt/persistent/var/lib/rancher /mnt/persistent/etc/rancher
   - ln -s /mnt/persistent/var/lib/rancher /var/lib/rancher
   - ln -s /mnt/persistent/etc/rancher /etc/rancher
+  # exclude containerd data from persistence
+  - mkdir -p /var/lib/containerd /var/lib/rancher/k3s/agent
+  - ln -s /var/lib/containerd /var/lib/rancher/k3s/agent/containerd
   # install k3s
   - set -a; . /root/k3s.env; set +a
 %{if ip != null && is_server~}
