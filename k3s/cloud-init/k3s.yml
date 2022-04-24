@@ -2,12 +2,16 @@
 
 %{if persistent_volume_dev != ""~}
 fs_setup:
-  - label: k3s-data
+  - label: ${persistent_volume_label}
     filesystem: ext4
     device: ${persistent_volume_dev}
 
 mounts:
-  - [${persistent_volume_dev}, /mnt/persistent]
+%{if persistent_volume_dev == persistent_volume_label~}
+  # clear default mount for ephemeral disk
+  - [${persistent_volume_dev}, null]
+%{endif~}
+  - [LABEL=${persistent_volume_label}, /mnt/persistent]
 %{endif~}
 
 write_files:

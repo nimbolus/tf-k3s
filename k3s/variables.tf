@@ -72,6 +72,11 @@ variable "persistent_volume_dev" {
   description = "optional device for persistent data (e.g. /dev/vdb)"
 }
 
+variable "persistent_volume_label" {
+  default     = "k3s-data"
+  description = "filesystem label for persistent data"
+}
+
 variable "cni_plugins_version" {
   default = "v0.9.0"
 }
