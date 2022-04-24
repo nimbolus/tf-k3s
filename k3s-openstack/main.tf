@@ -1,6 +1,6 @@
 locals {
   create_data_volume = var.data_volume_size > 0
-  data_volume_name   = var.image_scsi_bus ? "/dev/sdb" : "/dev/vdb"
+  data_volume_name   = var.ephemeral_data_volume ? "ephemeral0" : (var.image_scsi_bus ? "/dev/sdb" : "/dev/vdb")
 }
 
 data "openstack_compute_flavor_v2" "k3s" {
@@ -43,6 +43,7 @@ module "k3s" {
   bootstrap_token_id              = var.bootstrap_token_id
   bootstrap_token_secret          = var.bootstrap_token_secret
   persistent_volume_dev           = local.create_data_volume ? local.data_volume_name : ""
+  persistent_volume_label         = var.ephemeral_data_volume ? "ephemeral0" : null
 }
 
 resource "openstack_compute_instance_v2" "node" {
