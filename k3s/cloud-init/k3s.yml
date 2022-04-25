@@ -44,7 +44,7 @@ runcmd:
   - export INSTALL_K3S_EXEC="$INSTALL_K3S_EXEC --node-external-ip=${external_ip}"
 %{endif~}
   - bash -c "for i in {1..6}; do (ping -c 10 -q github.com) && break || (echo 'failed to verify network, will try again soon'); done"
-  - curl -sfL https://get.k3s.io | sh -
+  - curl -sfL ${k3s_install_url} | sh -
   # install cni plugins
   - wget --no-verbose -O /tmp/cni-plugins.tgz https://github.com/containernetworking/plugins/releases/download/${cni_plugins_version}/cni-plugins-linux-amd64-${cni_plugins_version}.tgz
   - mkdir -p /opt/cni/bin
