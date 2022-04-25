@@ -22,6 +22,11 @@ variable "k3s_channel" {
   description = "channel to use for fetching k3s download URL, could be stable, latest or testing (overridden by k3s_version)"
 }
 
+variable "k3s_install_url" {
+  default     = "https://get.k3s.io"
+  description = "download url for installation script"
+}
+
 variable "k3s_ip" {
   type        = string
   default     = null
