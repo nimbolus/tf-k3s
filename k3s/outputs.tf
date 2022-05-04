@@ -15,6 +15,7 @@ output "user_data" {
     persistent_volume_dev           = var.persistent_volume_dev
     persistent_volume_label         = var.persistent_volume_label
     is_server                       = contains(var.k3s_args, "server")
+    k3s_install_url                 = var.k3s_install_url
     k3s_config = base64encode(<<-EOT
       K3S_TOKEN=${var.cluster_token}
       K3S_URL=${var.k3s_url}
