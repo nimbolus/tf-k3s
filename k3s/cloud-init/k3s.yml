@@ -26,13 +26,13 @@ write_files:
   ${indent(2, custom_cloud_config_write_files)}
 
 runcmd:
+  - mkdir -p /mnt/persistent/var/lib/rancher/k3s/agent /mnt/persistent/etc/rancher /var/lib/containerd
+  # exclude containerd data from persistence
+  - if [ -d /mnt/persistent/var/lib/rancher/k3s/agent/containerd ]; then rm -r /mnt/persistent/var/lib/rancher/k3s/agent/containerd; fi
+  - ln -s /var/lib/containerd /mnt/persistent/var/lib/rancher/k3s/agent/containerd
   # setup persistence
-  - mkdir -p /mnt/persistent/var/lib/rancher /mnt/persistent/etc/rancher
   - ln -s /mnt/persistent/var/lib/rancher /var/lib/rancher
   - ln -s /mnt/persistent/etc/rancher /etc/rancher
-  # exclude containerd data from persistence
-  - mkdir -p /var/lib/containerd /var/lib/rancher/k3s/agent
-  - ln -s /var/lib/containerd /var/lib/rancher/k3s/agent/containerd
   # install k3s
   - set -a; . /root/k3s.env; set +a
 %{if ip != null && is_server~}
