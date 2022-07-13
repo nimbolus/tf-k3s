@@ -44,6 +44,12 @@ variable "security_group_ids" {
   default = []
 }
 
+variable "allowed_address_cidrs" {
+  type        = list(string)
+  default     = []
+  description = "list of CIDRs which will be whitelisted by the anti-spoofing rules"
+}
+
 variable "config_drive" {
   default = false
 }

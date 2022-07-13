@@ -123,6 +123,12 @@ resource "openstack_networking_port_v2" "mgmt" {
     ip_address = var.k3s_ip
   }
 
+  dynamic "allowed_address_pairs" {
+    for_each = var.allowed_address_cidrs
+    content {
+      ip_address = allowed_address_pairs.value
+    }
+  }
 }
 
 resource "openstack_networking_floatingip_v2" "node" {
