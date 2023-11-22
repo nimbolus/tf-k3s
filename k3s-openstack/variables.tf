@@ -82,6 +82,16 @@ variable "server_properties" {
   default     = {}
 }
 
+variable "server_properties_fetch_k3s_version" {
+  default     = false
+  description = "fetch k3s version from metadata property k3s_version"
+}
+
+variable "server_properties_fetch_k3s_channel" {
+  default     = false
+  description = "fetch k3s channel from metadata property k3s_channel"
+}
+
 variable "server_stop_before_destroy" {
   default     = false
   description = "shutdown instance gracefully before destroying"

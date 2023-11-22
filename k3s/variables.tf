@@ -72,6 +72,12 @@ variable "custom_cloud_config_runcmd" {
   default = ""
 }
 
+variable "custom_cloud_config_overrides" {
+  type        = list(string)
+  description = "override shell variables before installing k3s (only for module-internal purposes)"
+  default     = []
+}
+
 variable "persistent_volume_dev" {
   default     = ""
   description = "optional device for persistent data (e.g. /dev/vdb)"
