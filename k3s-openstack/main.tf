@@ -39,12 +39,16 @@ module "k3s" {
   k3s_url                         = var.k3s_url
   k3s_external_ip                 = var.k3s_external_ip != null ? var.k3s_external_ip : local.node_external_ip
   k3s_args                        = var.k3s_args
-  custom_cloud_config_write_files = var.custom_cloud_config_write_files
-  custom_cloud_config_runcmd      = var.custom_cloud_config_runcmd
   bootstrap_token_id              = var.bootstrap_token_id
   bootstrap_token_secret          = var.bootstrap_token_secret
   persistent_volume_dev           = local.create_data_volume ? local.data_volume_name : ""
   persistent_volume_label         = var.ephemeral_data_volume ? "ephemeral0" : "k3s-data"
+  custom_cloud_config_write_files = var.custom_cloud_config_write_files
+  custom_cloud_config_runcmd      = var.custom_cloud_config_runcmd
+  custom_cloud_config_overrides = concat(
+    var.server_properties_fetch_k3s_version ? ["export INSTALL_K3S_VERSION=$(curl -s http://169.254.169.254/openstack/latest/meta_data.json | sed -r 's/.*\"k3s_version\": \"([^\"]*)\".*/\\1/')"] : [],
+    var.server_properties_fetch_k3s_channel ? ["export INSTALL_K3S_CHANNEL=$(curl -s http://169.254.169.254/openstack/latest/meta_data.json | sed -r 's/.*\"k3s_channel\": \"([^\"]*)\".*/\\1/')"] : [],
+  )
 }
 
 resource "openstack_compute_instance_v2" "node" {

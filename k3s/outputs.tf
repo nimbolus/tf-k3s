@@ -10,6 +10,7 @@ output "user_data" {
   value = templatefile("${path.module}/cloud-init/k3s.yml", {
     custom_cloud_config_write_files = var.custom_cloud_config_write_files
     custom_cloud_config_runcmd      = var.custom_cloud_config_runcmd
+    custom_cloud_config_overrides   = var.custom_cloud_config_overrides
     ip                              = var.k3s_ip
     external_ip                     = var.k3s_external_ip
     persistent_volume_dev           = var.persistent_volume_dev
