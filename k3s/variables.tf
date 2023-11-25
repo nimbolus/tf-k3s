@@ -33,6 +33,12 @@ variable "k3s_ip" {
   description = "ip the k3s node uses cluster-internally"
 }
 
+variable "k3s_ips" {
+  type        = list(string)
+  default     = []
+  description = "ips the k3s node uses cluster-internally"
+}
+
 variable "k3s_url" {
   default     = ""
   description = "api url of the existing cluster this node should join to"
