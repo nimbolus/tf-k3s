@@ -35,7 +35,7 @@ module "k3s" {
   k3s_version                     = var.k3s_version
   k3s_channel                     = var.k3s_channel
   k3s_install_url                 = var.k3s_install_url
-  k3s_ip                          = openstack_networking_port_v2.mgmt.all_fixed_ips[0]
+  k3s_ips                         = openstack_networking_port_v2.mgmt.all_fixed_ips
   k3s_url                         = var.k3s_url
   k3s_external_ip                 = var.k3s_external_ip != null ? var.k3s_external_ip : local.node_external_ip
   k3s_args                        = var.k3s_args
@@ -118,9 +118,12 @@ resource "openstack_networking_port_v2" "mgmt" {
   security_group_ids    = var.security_group_ids
   port_security_enabled = true
 
-  fixed_ip {
-    subnet_id  = var.subnet_id
-    ip_address = var.k3s_ip
+  dynamic "fixed_ip" {
+    for_each = toset(var.k3s_ips)
+    content {
+      subnet_id  = var.subnet_id
+      ip_address = fixed_ip.value
+    }
   }
 
   dynamic "allowed_address_pairs" {
