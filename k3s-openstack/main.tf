@@ -35,7 +35,7 @@ module "k3s" {
   k3s_version                     = var.k3s_version
   k3s_channel                     = var.k3s_channel
   k3s_install_url                 = var.k3s_install_url
-  k3s_ips                         = openstack_networking_port_v2.mgmt.all_fixed_ips
+  k3s_ips                         = local.mgmt_port.all_fixed_ips
   k3s_url                         = var.k3s_url
   k3s_external_ip                 = var.k3s_external_ip != null ? var.k3s_external_ip : local.node_external_ip
   k3s_args                        = var.k3s_args
@@ -63,7 +63,7 @@ resource "openstack_compute_instance_v2" "node" {
   }
 
   network {
-    port           = openstack_networking_port_v2.mgmt.id
+    port           = local.mgmt_port.id
     access_network = true
   }
 
@@ -112,6 +112,32 @@ resource "openstack_compute_instance_v2" "node" {
 }
 
 resource "openstack_networking_port_v2" "mgmt" {
+  count = length(var.allowed_address_cidrs) == 0 ? 1 : 0
+
+  name                  = var.name
+  network_id            = var.network_id
+  admin_state_up        = true
+  security_group_ids    = var.security_group_ids
+  port_security_enabled = true
+
+  dynamic "fixed_ip" {
+    for_each = toset(var.k3s_ips)
+    content {
+      subnet_id  = var.subnet_id
+      ip_address = fixed_ip.value
+    }
+  }
+
+  lifecycle {
+    ignore_changes = [
+      allowed_address_pairs,
+    ]
+  }
+}
+
+resource "openstack_networking_port_v2" "mgmt_with_allowed_address_pairs" {
+  count = length(var.allowed_address_cidrs) > 0 ? 1 : 0
+
   name                  = var.name
   network_id            = var.network_id
   admin_state_up        = true
@@ -151,4 +177,5 @@ locals {
   node_external_ip = length(openstack_networking_floatingip_v2.node) > 0 ? openstack_networking_floatingip_v2.node[0].address : null
   k3s_url          = var.k3s_join_existing ? var.k3s_url : "https://${local.node_ip}:6443"
   k3s_external_url = (var.k3s_join_existing || local.node_external_ip == null) ? "" : "https://${local.node_external_ip}:6443"
+  mgmt_port        = try(openstack_networking_port_v2.mgmt.0, openstack_networking_port_v2.mgmt_with_allowed_address_pairs.0)
 }
