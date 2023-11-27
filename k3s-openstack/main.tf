@@ -1,6 +1,9 @@
 locals {
   create_data_volume = var.data_volume_size > 0
-  data_volume_name   = var.ephemeral_data_volume ? "ephemeral0" : (var.image_scsi_bus ? "/dev/sdb" : "/dev/vdb")
+  data_volume_name   = local.create_data_volume ? coalesce(
+    var.ephemeral_data_volume ? "ephemeral0" : null,
+    var.image_scsi_bus ? "/dev/disk/by-id/scsi-0QEMU_QEMU_HARDDISK_${openstack_blockstorage_volume_v3.data.0.id}" : "/dev/vdb",
+  ) : ""
 }
 
 data "openstack_compute_flavor_v2" "k3s" {
@@ -43,7 +46,7 @@ module "k3s" {
   custom_cloud_config_runcmd      = var.custom_cloud_config_runcmd
   bootstrap_token_id              = var.bootstrap_token_id
   bootstrap_token_secret          = var.bootstrap_token_secret
-  persistent_volume_dev           = local.create_data_volume ? local.data_volume_name : ""
+  persistent_volume_dev           = local.data_volume_name
   persistent_volume_label         = var.ephemeral_data_volume ? "ephemeral0" : "k3s-data"
 }
 
